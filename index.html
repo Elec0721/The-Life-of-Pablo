@@ -1,0 +1,3053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Life of Pablo — Music Empire Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== ROOT VARIABLES ===== */
+:root {
+  --bg: #050508;
+  --bg2: #0d0d16;
+  --bg3: #13131f;
+  --gold: #FFD700;
+  --gold2: #FFA500;
+  --cyan: #00f5ff;
+  --pink: #ff2d78;
+  --purple: #8B5CF6;
+  --green: #00ff88;
+  --red: #ff4444;
+  --panel: rgba(255,255,255,0.035);
+  --border: rgba(255,215,0,0.18);
+  --border2: rgba(255,255,255,0.07);
+  --text: #e8e8f0;
+  --text2: #888aaa;
+  --glow-gold: 0 0 20px rgba(255,215,0,0.4),0 0 60px rgba(255,215,0,0.15);
+  --glow-cyan: 0 0 20px rgba(0,245,255,0.35);
+  --glow-pink: 0 0 20px rgba(255,45,120,0.35);
+  --glow-purple: 0 0 20px rgba(139,92,246,0.4);
+  --radius: 12px;
+  --sidebar-w: 220px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani','Segoe UI',sans-serif;font-size:15px;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:rgba(255,215,0,0.4);border-radius:3px;}
+
+/* ===== SPLASH SCREEN ===== */
+#splash{
+  position:fixed;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;z-index:9999;
+  background:var(--bg);overflow:hidden;
+}
+.splash-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%,rgba(139,92,246,0.12) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 40% at 20% 80%,rgba(255,215,0,0.07) 0%,transparent 60%),
+    radial-gradient(ellipse 30% 30% at 80% 20%,rgba(0,245,255,0.05) 0%,transparent 60%);
+}
+.splash-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,215,0,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,215,0,0.04) 1px,transparent 1px);
+  background-size:50px 50px;
+  animation:gridScroll 8s linear infinite;
+}
+@keyframes gridScroll{from{background-position:0 0;}to{background-position:50px 50px;}}
+
+#splash-particles{position:absolute;inset:0;pointer-events:none;}
+.sp{position:absolute;border-radius:50%;animation:spFloat linear infinite;}
+@keyframes spFloat{
+  from{transform:translateY(100vh) rotate(0deg);opacity:0;}
+  10%{opacity:0.8;}90%{opacity:0.4;}
+  to{transform:translateY(-50px) rotate(360deg);opacity:0;}
+}
+
+.splash-inner{position:relative;text-align:center;animation:fadeInUp 1s ease 0.3s both;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+.splash-logo{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(32px,7vw,76px);
+  font-weight:900;
+  line-height:1;
+  background:linear-gradient(135deg,#FFD700 0%,#FFA500 30%,#ff2d78 65%,#8B5CF6 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 40px rgba(255,215,0,0.5));
+  animation:logoPulse 3s ease-in-out infinite;
+  letter-spacing:-1px;
+}
+@keyframes logoPulse{
+  0%,100%{filter:drop-shadow(0 0 30px rgba(255,215,0,0.4));}
+  50%{filter:drop-shadow(0 0 70px rgba(255,215,0,0.8)) drop-shadow(0 0 120px rgba(139,92,246,0.4));}
+}
+.splash-the{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(11px,1.5vw,15px);
+  letter-spacing:10px;
+  color:var(--cyan);
+  text-transform:uppercase;
+  margin-bottom:4px;
+  animation:fadeIn 1.5s ease 0.5s both;
+}
+.splash-sub{
+  font-size:clamp(12px,1.5vw,15px);
+  letter-spacing:5px;
+  color:var(--text2);
+  text-transform:uppercase;
+  margin-top:12px;
+  margin-bottom:50px;
+  animation:fadeIn 1.5s ease 0.8s both;
+}
+.splash-form{
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  animation:fadeInUp 0.8s ease 1s both;
+}
+.splash-label{font-size:11px;letter-spacing:4px;color:var(--text2);text-transform:uppercase;}
+.splash-input{
+  background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  border-radius:10px;padding:14px 28px;font-size:18px;
+  font-family:'Rajdhani',sans-serif;color:var(--gold);text-align:center;
+  width:300px;outline:none;transition:all 0.3s;letter-spacing:1px;
+}
+.splash-input:focus{border-color:var(--gold);box-shadow:var(--glow-gold);}
+.splash-input::placeholder{color:var(--text2);font-size:14px;}
+
+.btn-start{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#000;border:none;border-radius:10px;
+  padding:16px 56px;font-size:16px;
+  font-family:'Orbitron',monospace;font-weight:700;
+  letter-spacing:3px;cursor:pointer;transition:all 0.3s;
+  text-transform:uppercase;margin-top:8px;
+  box-shadow:0 4px 30px rgba(255,215,0,0.2);
+}
+.btn-start:hover{transform:translateY(-3px);box-shadow:0 10px 50px rgba(255,215,0,0.5);}
+
+/* ===== GAME CONTAINER ===== */
+#game{display:none;flex-direction:column;height:100vh;}
+
+/* ===== HUD ===== */
+.hud{
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;height:52px;flex-shrink:0;
+  background:rgba(5,5,8,0.97);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);z-index:100;position:relative;
+}
+.hud-brand{
+  font-family:'Orbitron',monospace;font-size:12px;font-weight:900;
+  letter-spacing:2px;white-space:nowrap;flex-shrink:0;
+  background:linear-gradient(90deg,var(--gold),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hud-stats{display:flex;gap:6px;flex:1;overflow-x:auto;scrollbar-width:none;}
+.hud-stats::-webkit-scrollbar{display:none;}
+.hstat{
+  display:flex;align-items:center;gap:5px;
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:6px;padding:5px 10px;white-space:nowrap;flex-shrink:0;
+}
+.hstat .hi{font-size:13px;}
+.hstat .hv{color:var(--gold);font-family:'Orbitron',monospace;font-size:11px;font-weight:700;}
+.hstat .hl{color:var(--text2);font-size:10px;margin-left:1px;}
+.hud-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;}
+.hud-week{font-family:'Orbitron',monospace;font-size:10px;color:var(--cyan);letter-spacing:1px;}
+.btn-advance{
+  background:linear-gradient(135deg,var(--purple),#5B21B6);
+  color:#fff;border:none;border-radius:6px;
+  padding:7px 14px;font-size:10px;
+  font-family:'Orbitron',monospace;font-weight:700;
+  letter-spacing:1px;cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.btn-advance:hover{box-shadow:var(--glow-purple);transform:translateY(-1px);}
+
+/* ===== GAME BODY ===== */
+.game-body{display:flex;flex:1;overflow:hidden;}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;z-index:10;
+}
+.player-card{padding:18px 14px;border-bottom:1px solid var(--border);text-align:center;}
+.player-avatar{
+  width:68px;height:68px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--gold));
+  margin:0 auto 10px;display:flex;align-items:center;justify-content:center;
+  font-size:28px;box-shadow:0 0 30px rgba(139,92,246,0.4);
+  border:2px solid rgba(255,215,0,0.3);position:relative;overflow:hidden;
+}
+.player-avatar::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(135deg,rgba(255,255,255,0.25),transparent);
+}
+.player-name{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px;}
+.player-title{font-size:10px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;}
+.sidebar-section{
+  padding:10px 16px 4px;font-size:10px;
+  letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-top:6px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;cursor:pointer;transition:all 0.2s;
+  border-left:3px solid transparent;font-size:13px;font-weight:600;
+  color:var(--text2);letter-spacing:0.5px;
+}
+.nav-item:hover{background:rgba(255,215,0,0.05);color:var(--text);}
+.nav-item.active{background:rgba(255,215,0,0.08);border-left-color:var(--gold);color:var(--gold);}
+.nav-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+
+/* ===== CONTENT AREA ===== */
+.content{flex:1;overflow-y:auto;padding:18px;background:var(--bg);position:relative;}
+.tab-panel{display:none;animation:fadeInUp 0.3s ease;}
+.tab-panel.active{display:block;}
+
+/* ===== PANELS ===== */
+.panel{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.panel::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4),transparent);
+}
+.panel-title{
+  font-family:'Orbitron',monospace;font-size:12px;font-weight:700;
+  letter-spacing:2px;color:var(--gold);text-transform:uppercase;
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+
+/* STAT BARS */
+.sbar-wrap{margin-bottom:9px;}
+.sbar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:var(--text2);}
+.sbar-label span:last-child{color:var(--gold);font-weight:700;}
+.sbar-track{height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.sbar-fill{height:100%;border-radius:3px;transition:width 0.6s ease;}
+
+/* BUTTONS */
+.btn{
+  border:none;border-radius:8px;padding:9px 18px;font-size:13px;
+  font-weight:700;font-family:'Rajdhani',sans-serif;cursor:pointer;
+  transition:all 0.2s;letter-spacing:0.5px;display:inline-flex;
+  align-items:center;gap:6px;text-transform:uppercase;
+}
+.btn:hover:not(:disabled){transform:translateY(-1px);}
+.btn:disabled{opacity:0.38;cursor:not-allowed;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;}
+.btn-gold:hover:not(:disabled){box-shadow:var(--glow-gold);}
+.btn-cyan{background:linear-gradient(135deg,var(--cyan),#0099bb);color:#000;}
+.btn-cyan:hover:not(:disabled){box-shadow:var(--glow-cyan);}
+.btn-pink{background:linear-gradient(135deg,var(--pink),#bb0044);color:#fff;}
+.btn-pink:hover:not(:disabled){box-shadow:var(--glow-pink);}
+.btn-purple{background:linear-gradient(135deg,var(--purple),#5B21B6);color:#fff;}
+.btn-purple:hover:not(:disabled){box-shadow:var(--glow-purple);}
+.btn-green{background:linear-gradient(135deg,var(--green),#00bb66);color:#000;}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-ghost:hover:not(:disabled){border-color:var(--gold);color:var(--gold);}
+.btn-sm{padding:6px 12px;font-size:11px;}
+.btn-lg{padding:14px 36px;font-size:15px;}
+.btn-full{width:100%;justify-content:center;}
+
+/* FORM ELEMENTS */
+.fg{margin-bottom:14px;}
+.flabel{display:block;font-size:10px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:6px;}
+.finput,.fselect{
+  width:100%;background:rgba(255,255,255,0.05);
+  border:1px solid var(--border2);border-radius:8px;
+  padding:9px 13px;color:var(--text);font-size:13px;
+  font-family:'Rajdhani',sans-serif;outline:none;transition:all 0.2s;
+}
+.finput:focus,.fselect:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,215,0,0.1);}
+.fselect option{background:var(--bg2);}
+
+/* CARDS */
+.card{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border2);
+  border-radius:10px;padding:14px;transition:all 0.2s;
+}
+.card:hover{border-color:rgba(255,215,0,0.3);background:rgba(255,255,255,0.04);}
+
+/* TAGS */
+.tag{display:inline-block;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600;}
+.tag-gold{background:rgba(255,215,0,0.12);color:var(--gold);border:1px solid rgba(255,215,0,0.3);}
+.tag-cyan{background:rgba(0,245,255,0.08);color:var(--cyan);border:1px solid rgba(0,245,255,0.3);}
+.tag-pink{background:rgba(255,45,120,0.08);color:var(--pink);border:1px solid rgba(255,45,120,0.3);}
+.tag-green{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.3);}
+.tag-purple{background:rgba(139,92,246,0.1);color:var(--purple);border:1px solid rgba(139,92,246,0.3);}
+
+/* NOTIFICATIONS */
+#notif-container{
+  position:fixed;top:62px;right:16px;z-index:9998;
+  display:flex;flex-direction:column;gap:8px;max-width:310px;pointer-events:none;
+}
+.notif{
+  background:rgba(10,10,18,0.97);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;font-size:13px;backdrop-filter:blur(20px);
+  animation:notifIn 0.4s ease;display:flex;align-items:flex-start;
+  gap:10px;pointer-events:all;line-height:1.4;
+  box-shadow:0 8px 40px rgba(0,0,0,0.6);
+}
+@keyframes notifIn{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+@keyframes notifOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(100%);}}
+.notif.good{border-left:3px solid var(--green);}
+.notif.bad{border-left:3px solid var(--pink);}
+.notif.info{border-left:3px solid var(--cyan);}
+.notif.epic{border-left:3px solid var(--gold);box-shadow:var(--glow-gold);}
+.notif.warn{border-left:3px solid var(--gold2);}
+.ni{font-size:16px;flex-shrink:0;margin-top:1px;}
+.nt strong{color:var(--gold);}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.82);
+  backdrop-filter:blur(12px);z-index:1000;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  animation:fadeIn 0.2s ease;
+}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:28px;max-width:520px;width:100%;max-height:82vh;
+  overflow-y:auto;position:relative;animation:modalIn 0.3s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(0.88);}to{opacity:1;transform:scale(1);}}
+.modal-title{
+  font-family:'Orbitron',monospace;font-size:16px;font-weight:700;
+  color:var(--gold);margin-bottom:18px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.modal-close{
+  position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);
+  border:none;border-radius:50%;width:28px;height:28px;
+  color:var(--text);cursor:pointer;font-size:15px;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.modal-close:hover{background:rgba(255,45,120,0.3);color:var(--pink);}
+
+/* ALBUM COVER CSS ART */
+.album-cover{
+  width:100%;aspect-ratio:1;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;position:relative;overflow:hidden;
+  margin-bottom:10px;box-shadow:0 8px 30px rgba(0,0,0,0.5);
+}
+
+/* IN-PROGRESS */
+.in-progress{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.3);
+  border-radius:8px;padding:12px 14px;margin-bottom:10px;
+}
+.prog-dot{
+  width:10px;height:10px;border-radius:50%;background:var(--purple);
+  animation:pulse 1.5s ease-in-out infinite;flex-shrink:0;
+}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:0.4;}}
+.lbar{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-top:6px;}
+.lbar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:2px;transition:width 0.5s;}
+
+/* QUICK ACTIONS */
+.qaction{
+  background:var(--panel);border:1px solid var(--border2);border-radius:10px;
+  padding:14px 10px;cursor:pointer;transition:all 0.25s;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+}
+.qaction:hover{border-color:rgba(255,215,0,0.4);background:rgba(255,215,0,0.04);transform:translateY(-2px);}
+.qaction:disabled{opacity:0.35;cursor:not-allowed;transform:none;}
+.qa-icon{font-size:26px;}
+.qa-name{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.qa-cost{font-size:10px;color:var(--text2);}
+
+/* NEWS / CHART */
+.chart-row{
+  display:flex;align-items:center;gap:10px;padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.chart-rank{font-family:'Orbitron',monospace;font-size:11px;color:var(--text2);width:22px;text-align:right;flex-shrink:0;}
+.chart-info{flex:1;}
+.chart-title{font-size:13px;font-weight:700;}
+.chart-artist{font-size:11px;color:var(--text2);}
+.chart-pts{font-size:12px;color:var(--gold);font-weight:700;flex-shrink:0;}
+
+/* RIVAL */
+.rival-card{
+  background:rgba(255,45,120,0.04);border:1px solid rgba(255,45,120,0.2);
+  border-radius:10px;padding:13px;display:flex;align-items:center;gap:12px;
+}
+.rival-av{
+  width:42px;height:42px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;border:1px solid rgba(255,45,120,0.3);
+}
+
+/* AWARD */
+.award-card{
+  background:linear-gradient(135deg,rgba(255,215,0,0.07),rgba(255,165,0,0.03));
+  border:1px solid rgba(255,215,0,0.25);border-radius:10px;
+  padding:14px;text-align:center;
+}
+.award-icon{font-size:28px;margin-bottom:8px;}
+.award-name{font-size:12px;font-weight:700;color:var(--gold);}
+.award-desc{font-size:11px;color:var(--text2);margin-top:3px;}
+
+/* ACHIEVEMENT */
+.ach{
+  display:flex;align-items:center;gap:12px;padding:11px;
+  background:var(--panel);border-radius:8px;margin-bottom:8px;
+  border:1px solid transparent;transition:all 0.2s;
+}
+.ach.unlocked{border-color:rgba(255,215,0,0.25);}
+.ach.locked{opacity:0.3;filter:grayscale(100%);}
+.ach-icon{font-size:22px;}
+.ach-name{font-size:13px;font-weight:700;}
+.ach-desc{font-size:11px;color:var(--text2);margin-top:1px;}
+
+/* SOCIAL POST */
+.spost{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border2);
+  border-radius:10px;padding:13px;margin-bottom:10px;
+}
+.spost-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.spost-av{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.spost-name{font-size:13px;font-weight:700;}
+.spost-handle{font-size:10px;color:var(--text2);}
+.spost-time{margin-left:auto;font-size:10px;color:var(--text2);}
+.spost-body{font-size:13px;line-height:1.5;}
+.spost-stats{display:flex;gap:14px;margin-top:9px;font-size:12px;color:var(--text2);}
+
+/* CITY SELECTOR */
+.city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;}
+.city-btn{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border2);
+  border-radius:8px;padding:10px 8px;cursor:pointer;
+  transition:all 0.2s;text-align:center;font-family:'Rajdhani',sans-serif;
+  color:var(--text);
+}
+.city-btn:hover{border-color:var(--cyan);background:rgba(0,245,255,0.05);}
+.city-btn.sel{border-color:var(--cyan);background:rgba(0,245,255,0.1);}
+.city-name{font-size:12px;font-weight:700;}
+.city-cap{font-size:10px;color:var(--text2);}
+
+/* COLOR PICKER */
+.color-opts{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;}
+.color-opt{width:30px;height:30px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;}
+.color-opt.sel{border-color:#fff;transform:scale(1.2);}
+
+/* FASHION PRODUCT */
+.fproduct{
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:10px;padding:14px;text-align:center;
+}
+.fprod-icon{font-size:32px;margin-bottom:8px;}
+.fprod-name{font-size:13px;font-weight:700;}
+.fprod-sales{font-size:11px;color:var(--green);margin-top:3px;}
+.fprod-revenue{font-size:12px;color:var(--gold);margin-top:2px;}
+
+/* STUDIO */
+.studio-level{
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(255,215,0,0.05));
+  border:2px solid var(--purple);border-radius:14px;padding:24px;
+  margin-bottom:14px;
+}
+.studio-icon{font-size:48px;margin-bottom:8px;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.studio-lv{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--gold);}
+.studio-name{font-size:13px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+
+/* PRODUCER CARD */
+.prod-card{
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:10px;padding:13px;
+}
+.prod-icon{font-size:24px;margin-bottom:6px;}
+.prod-name{font-size:13px;font-weight:700;}
+.prod-bonus{font-size:11px;color:var(--green);margin-top:3px;}
+.prod-cost{font-size:12px;color:var(--gold);}
+
+/* WORLD NEWS */
+.news-item-full{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border2);
+  border-radius:8px;padding:12px 14px;margin-bottom:8px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.news-emoji{font-size:20px;flex-shrink:0;margin-top:1px;}
+.news-txt{font-size:13px;line-height:1.4;}
+.news-time{font-size:10px;color:var(--text2);margin-top:4px;}
+
+/* SCROLL LIST */
+.scroll-list{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:36px 20px;color:var(--text2);}
+.empty .ei{font-size:36px;margin-bottom:12px;}
+.empty .et{font-size:14px;}
+
+/* INTERVIEW */
+.int-q{
+  background:rgba(0,245,255,0.05);border-left:3px solid var(--cyan);
+  padding:12px 14px;border-radius:0 8px 8px 0;margin-bottom:12px;
+  font-size:14px;font-style:italic;
+}
+.int-choice{
+  background:var(--panel);border:1px solid var(--border2);border-radius:8px;
+  padding:11px 14px;cursor:pointer;transition:all 0.2s;margin-bottom:7px;font-size:13px;
+}
+.int-choice:hover{border-color:var(--gold);background:rgba(255,215,0,0.05);}
+
+/* TOUR STOP */
+.tstop{
+  display:flex;align-items:center;gap:10px;padding:9px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.tstop-num{
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(139,92,246,0.2);border:1px solid var(--purple);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:var(--purple);flex-shrink:0;
+}
+
+/* DIVIDER */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:14px 0;}
+
+/* WAVEFORM */
+.waveform{display:flex;align-items:flex-end;gap:2px;height:28px;}
+.wb{width:3px;border-radius:2px;background:var(--gold);animation:wv var(--s) ease-in-out infinite alternate;}
+@keyframes wv{from{transform:scaleY(0.15);}to{transform:scaleY(1);}}
+
+/* ENDING */
+#ending{
+  display:none;position:fixed;inset:0;background:var(--bg);
+  z-index:9999;align-items:center;justify-content:center;
+  flex-direction:column;text-align:center;padding:20px;
+}
+.ending-title{font-family:'Orbitron',monospace;font-size:clamp(24px,5vw,52px);font-weight:900;color:var(--gold);margin-bottom:10px;}
+.ending-sub{font-size:18px;color:var(--text2);margin-bottom:30px;}
+
+/* BG PARTICLES */
+#gpfx{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.gp{position:absolute;border-radius:50%;animation:gpf linear infinite;}
+@keyframes gpf{from{transform:translateY(110vh);opacity:0;}5%{opacity:0.5;}95%{opacity:0.2;}to{transform:translateY(-60px);opacity:0;}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  :root{--sidebar-w:56px;}
+  .nav-item{padding:13px;justify-content:center;}
+  .nav-item .nav-label{display:none;}
+  .player-card{padding:8px;}
+  .player-avatar{width:38px;height:38px;font-size:16px;}
+  .player-name,.player-title,.sidebar-section{display:none;}
+  .grid-2{grid-template-columns:1fr;}
+  .grid-3{grid-template-columns:1fr 1fr;}
+  .grid-4{grid-template-columns:1fr 1fr;}
+  .hud-brand{display:none;}
+  .content{padding:12px;}
+}
+@media(max-width:480px){
+  .grid-3,.grid-4{grid-template-columns:1fr;}
+}
+
+/* ===== NEW FEATURE STYLES ===== */
+
+/* COOLDOWN */
+.cd-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--pink);font-weight:700;background:rgba(255,45,120,0.1);border:1px solid rgba(255,45,120,0.3);border-radius:100px;padding:2px 8px;letter-spacing:0.5px;}
+.cd-timer{display:block;font-size:10px;color:var(--pink);margin-top:3px;font-family:'Orbitron',monospace;letter-spacing:1px;}
+.cd-ready{display:block;font-size:10px;color:var(--green);margin-top:3px;font-family:'Orbitron',monospace;letter-spacing:1px;}
+
+/* TWEET COMPOSER */
+.tweet-composer{background:rgba(255,255,255,0.025);border:1px solid var(--border2);border-radius:12px;padding:14px;}
+.tweet-composer textarea{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;resize:none;line-height:1.5;min-height:80px;}
+.tweet-composer textarea::placeholder{color:var(--text2);}
+.tweet-composer-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);flex-wrap:wrap;gap:8px;}
+.char-counter{font-family:'Orbitron',monospace;font-size:11px;color:var(--text2);}
+.char-counter.warn{color:var(--gold2);}
+.char-counter.over{color:var(--pink);}
+.tweet-type-btns{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* COVER UPLOAD */
+.cover-upload-zone{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;min-height:80px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;margin-bottom:10px;}
+.cover-upload-zone:hover{border-color:var(--gold);background:rgba(255,215,0,0.03);}
+.cover-upload-zone.has-img{border-style:solid;border-color:var(--green);}
+.cover-upload-zone img{max-height:60px;max-width:100%;border-radius:6px;object-fit:cover;}
+.uz-icon{font-size:20px;}
+.uz-text{font-size:11px;color:var(--text2);letter-spacing:1px;}
+.uz-clear{font-size:10px;color:var(--pink);cursor:pointer;margin-top:4px;text-decoration:underline;}
+
+/* TRACKLIST EDITOR */
+.tracklist-editor{background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.25);border-radius:10px;padding:14px;margin-top:10px;}
+.tl-editor-title{font-size:10px;letter-spacing:2px;color:var(--purple);text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+.track-input-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.track-num{width:24px;height:24px;border-radius:50%;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--purple);flex-shrink:0;}
+.track-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:12px;outline:none;transition:all 0.2s;}
+.track-input:focus{border-color:var(--purple);box-shadow:0 0 0 2px rgba(139,92,246,0.15);}
+.track-input::placeholder{color:var(--text2);}
+.tracklist-scroll{max-height:220px;overflow-y:auto;}
+
+/* DISCOGRAPHY TRACKLIST */
+.disco-expand-btn{font-size:10px;color:var(--text2);cursor:pointer;border:none;background:transparent;padding:2px 6px;border-radius:4px;transition:color 0.2s;}
+.disco-expand-btn:hover{color:var(--gold);}
+.tracklist-expand{margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);display:none;}
+.tracklist-expand.open{display:block;}
+.tl-track-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.03);}
+.tl-track-row:last-child{border-bottom:none;}
+.tl-num{color:var(--purple);font-size:10px;width:18px;flex-shrink:0;font-family:'Orbitron',monospace;}
+.tl-name{flex:1;color:var(--text);}
+.tl-qual{font-size:10px;color:var(--gold);font-family:'Orbitron',monospace;}
+</style>
+</head>
+<body>
+
+<!-- ===== SPLASH SCREEN ===== -->
+<div id="splash">
+  <div class="splash-bg"></div>
+  <div class="splash-grid"></div>
+  <div id="splash-particles"></div>
+  <div class="splash-inner">
+    <div class="splash-the">✦ A Music Empire Simulator ✦</div>
+    <div class="splash-logo">THE LIFE<br>OF PABLO</div>
+    <div class="splash-sub">From Nothing to Legendary</div>
+    <div class="splash-form">
+      <label class="splash-label">Your Artist Name</label>
+      <input class="splash-input" id="name-input" type="text" placeholder="Enter your rap name..." maxlength="28">
+      <button class="btn-start" onclick="startGame()">▶ BEGIN YOUR LEGACY</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GAME ===== -->
+<div id="game">
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-brand">🎵 PABLO SIM</div>
+    <div class="hud-stats">
+      <div class="hstat"><span class="hi">💰</span><span class="hv" id="h-money">$500</span><span class="hl">MONEY</span></div>
+      <div class="hstat"><span class="hi">👥</span><span class="hv" id="h-fans">100</span><span class="hl">FANS</span></div>
+      <div class="hstat"><span class="hi">⭐</span><span class="hv" id="h-rep">20</span><span class="hl">REP</span></div>
+      <div class="hstat"><span class="hi">⚡</span><span class="hv" id="h-energy">100</span><span class="hl">ENERGY</span></div>
+      <div class="hstat"><span class="hi">🎨</span><span class="hv" id="h-create">50</span><span class="hl">CREAT</span></div>
+      <div class="hstat"><span class="hi">👑</span><span class="hv" id="h-ego">30</span><span class="hl">EGO</span></div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-week" id="h-week">WEEK 1 • 2004</div>
+      <button class="btn-advance" onclick="advanceWeek()">⏭ NEXT WEEK</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="game-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="player-card">
+        <div class="player-avatar" id="sb-avatar">🎤</div>
+        <div class="player-name" id="sb-name">Artist</div>
+        <div class="player-title" id="sb-title">UNKNOWN</div>
+      </div>
+      <div class="sidebar-section">Navigate</div>
+      <div class="nav-item active" onclick="showTab('dashboard')"><span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span></div>
+      <div class="nav-item" onclick="showTab('music')"><span class="nav-icon">🎵</span><span class="nav-label">Music</span></div>
+      <div class="nav-item" onclick="showTab('studio')"><span class="nav-icon">🎛️</span><span class="nav-label">Studio</span></div>
+      <div class="nav-item" onclick="showTab('tour')"><span class="nav-icon">🌍</span><span class="nav-label">Tour</span></div>
+      <div class="nav-item" onclick="showTab('fashion')"><span class="nav-icon">👗</span><span class="nav-label">Fashion</span></div>
+      <div class="nav-item" onclick="showTab('social')"><span class="nav-icon">📱</span><span class="nav-label">Social</span></div>
+      <div class="nav-item" onclick="showTab('world')"><span class="nav-icon">🌐</span><span class="nav-label">World</span></div>
+      <div class="nav-item" onclick="showTab('awards')"><span class="nav-icon">🏆</span><span class="nav-label">Awards</span></div>
+      <div class="sidebar-section">System</div>
+      <div class="nav-item" onclick="showTab('save')"><span class="nav-icon">💾</span><span class="nav-label">Save / Load</span></div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="tab-panel active" id="tab-dashboard">
+        <div class="grid-2">
+          <div>
+            <div class="panel">
+              <div class="panel-title">📊 Artist Stats</div>
+              <div id="stats-display"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">⚡ Quick Actions</div>
+              <div class="grid-3" id="quick-actions"></div>
+            </div>
+          </div>
+          <div>
+            <div class="panel">
+              <div class="panel-title">📰 Latest News</div>
+              <div id="news-dash" class="scroll-list"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">🔥 In Progress</div>
+              <div id="in-progress-dash"></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📈 Career Level</div>
+          <div id="career-bar-display"></div>
+        </div>
+      </div>
+
+      <!-- ===== MUSIC ===== -->
+      <div class="tab-panel" id="tab-music">
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">🎵 Create New Music</div>
+            <div id="music-recording-panel">
+              <div class="fg">
+                <label class="flabel">Type</label>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-ghost" id="type-single" onclick="setMusicType('single')" style="flex:1;">Single</button>
+                  <button class="btn btn-ghost" id="type-album" onclick="setMusicType('album')" style="flex:1;">Album</button>
+                  <button class="btn btn-ghost" id="type-collab" onclick="setMusicType('collab')" style="flex:1;">Collab</button>
+                </div>
+              </div>
+              <div class="fg">
+                <label class="flabel">Title</label>
+                <input class="finput" id="music-title" type="text" placeholder="Name your track..." maxlength="40">
+              </div>
+              <div class="fg">
+                <label class="flabel">Genre</label>
+                <select class="fselect" id="music-genre">
+                  <option>Hip-Hop</option><option>Trap</option><option>Gospel Rap</option>
+                  <option>R&B</option><option>Experimental</option><option>Pop Rap</option>
+                  <option>Drill</option><option>Conscious Rap</option><option>Lo-Fi</option>
+                  <option>Orchestral Rap</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label class="flabel">Number of Tracks</label>
+                <select class="fselect" id="music-tracks" onchange="onTracksChange()">
+                  <option value="1">1 Track (Single)</option>
+                  <option value="5">5 Tracks (EP)</option>
+                  <option value="10">10 Tracks (Album)</option>
+                  <option value="15">15 Tracks (Double Album)</option>
+                  <option value="20">20 Tracks (Opus)</option>
+                </select>
+              </div>
+
+              <!-- TRACKLIST EDITOR — shown for multi-track projects -->
+              <div class="tracklist-editor" id="tracklist-editor" style="display:none;">
+                <div class="tl-editor-title">🎵 Name Your Tracks</div>
+                <div class="tracklist-scroll" id="tracklist-inputs"></div>
+              </div>
+
+              <div class="fg" style="margin-top:12px;">
+                <label class="flabel">Cover Art — Upload Image</label>
+                <div class="cover-upload-zone" id="cover-upload-zone" onclick="document.getElementById('cover-file-input').click()">
+                  <input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="handleCoverUpload(event)">
+                  <div class="uz-icon">🖼️</div>
+                  <div class="uz-text">Click to upload a cover image</div>
+                </div>
+                <div id="cover-upload-status" style="font-size:11px;color:var(--text2);margin-bottom:6px;"></div>
+              </div>
+
+              <div class="fg">
+                <label class="flabel">— or — CSS Art Style</label>
+                <select class="fselect" id="music-style">
+                  <option value="geometric">Geometric</option>
+                  <option value="gradient">Gradient</option>
+                  <option value="dark">Dark Minimal</option>
+                  <option value="neon">Neon</option>
+                  <option value="abstract">Abstract</option>
+                  <option value="glitch">Glitch</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label class="flabel">Color Theme</label>
+                <div class="color-opts" id="cover-colors"></div>
+              </div>
+              <button class="btn btn-gold btn-full" onclick="startRecording()">🎙️ Start Recording</button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🎧 In Progress</div>
+            <div id="music-inprogress"></div>
+            <div class="panel-title" style="margin-top:14px;">💿 Discography</div>
+            <div class="scroll-list" id="discography"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STUDIO ===== -->
+      <div class="tab-panel" id="tab-studio">
+        <div class="studio-level" id="studio-display"></div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">🔧 Studio Upgrades</div>
+            <div id="studio-upgrades"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🎹 Hire Producers</div>
+            <div id="producers-panel"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">👨‍💼 Studio Staff</div>
+          <div class="grid-4" id="staff-panel"></div>
+        </div>
+      </div>
+
+      <!-- ===== TOUR ===== -->
+      <div class="tab-panel" id="tab-tour">
+        <div id="tour-active-display"></div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">🗺️ Plan Tour</div>
+            <div class="fg">
+              <label class="flabel">Tour Name</label>
+              <input class="finput" id="tour-name" type="text" placeholder="Name your tour..." maxlength="40">
+            </div>
+            <div class="fg">
+              <label class="flabel">Venue Size</label>
+              <select class="fselect" id="tour-venue">
+                <option value="club">Club (500 cap) — $5/ticket</option>
+                <option value="theater">Theater (2,000 cap) — $25/ticket</option>
+                <option value="arena">Arena (15,000 cap) — $75/ticket</option>
+                <option value="stadium">Stadium (60,000 cap) — $150/ticket</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="flabel">Select Cities</label>
+              <div class="city-grid" id="city-selector"></div>
+            </div>
+            <div style="margin-top:12px;padding:10px;background:rgba(0,245,255,0.06);border-radius:8px;font-size:12px;color:var(--text2);" id="tour-preview"></div>
+            <button class="btn btn-cyan btn-full" style="margin-top:12px;" onclick="startTour()">🚌 Launch Tour</button>
+          </div>
+          <div class="panel">
+            <div class="panel-title">📋 Tour History</div>
+            <div class="scroll-list" id="tour-history"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FASHION ===== -->
+      <div class="tab-panel" id="tab-fashion">
+        <div id="fashion-brand-display"></div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">🏷️ Launch / Manage Brand</div>
+            <div id="fashion-create"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">📦 Active Products</div>
+            <div class="grid-3" id="fashion-products"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🤝 Collaboration Offers</div>
+          <div id="fashion-collabs"></div>
+        </div>
+      </div>
+
+      <!-- ===== SOCIAL ===== -->
+      <div class="tab-panel" id="tab-social">
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">📝 Post to the World</div>
+
+            <!-- TWEET COMPOSER -->
+            <div class="tweet-composer">
+              <textarea id="social-post-text" maxlength="280" placeholder="What's on your mind? The world is watching... (280 chars)" oninput="updateCharCount()"></textarea>
+              <div class="tweet-composer-footer">
+                <span class="char-counter" id="char-counter">280</span>
+                <div class="tweet-type-btns">
+                  <button class="btn btn-sm btn-gold" id="btn-post-normal" onclick="makePost('normal')">🐦 Post</button>
+                  <button class="btn btn-sm btn-pink" id="btn-post-contro" onclick="makePost('controversial')">🔥 Controversial</button>
+                  <button class="btn btn-sm btn-purple" id="btn-post-humble" onclick="makePost('humble')">🙏 Humble</button>
+                </div>
+              </div>
+            </div>
+            <div id="post-cooldown-display" style="margin-bottom:12px;"></div>
+
+            <div class="divider"></div>
+            <div class="panel-title">🎤 Give Interview</div>
+            <div id="interview-cooldown-display" style="margin-bottom:8px;"></div>
+            <div id="interview-panel"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">📲 Feed</div>
+            <div class="scroll-list" id="social-feed"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== WORLD ===== -->
+      <div class="tab-panel" id="tab-world">
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">📡 Global News Feed</div>
+            <div class="scroll-list" id="world-news"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">📊 Music Charts — Top 10</div>
+            <div id="music-charts"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🎤 Rival Artists</div>
+          <div class="grid-3" id="rivals-panel"></div>
+        </div>
+      </div>
+
+      <!-- ===== AWARDS ===== -->
+      <div class="tab-panel" id="tab-awards">
+        <div class="panel">
+          <div class="panel-title">🏆 Trophies & Awards</div>
+          <div class="grid-4" id="awards-display"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🎖️ Achievements</div>
+          <div id="achievements-display"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📊 Career Stats</div>
+          <div class="grid-3" id="career-stats-display"></div>
+        </div>
+      </div>
+
+      <!-- ===== SAVE / LOAD ===== -->
+      <div class="tab-panel" id="tab-save">
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">💾 Save Game</div>
+            <p style="color:var(--text2);font-size:13px;margin-bottom:14px;">Your progress is autosaved each week. You can also manually save below.</p>
+            <div id="save-slots"></div>
+            <div class="divider"></div>
+            <button class="btn btn-gold btn-full" onclick="saveGame('slot1')">💾 Save to Slot 1</button>
+            <button class="btn btn-gold btn-full" style="margin-top:8px;" onclick="saveGame('slot2')">💾 Save to Slot 2</button>
+            <button class="btn btn-gold btn-full" style="margin-top:8px;" onclick="saveGame('slot3')">💾 Save to Slot 3</button>
+          </div>
+          <div class="panel">
+            <div class="panel-title">📂 Load Game</div>
+            <div id="load-slots"></div>
+            <div class="divider"></div>
+            <button class="btn btn-pink btn-full" style="margin-top:14px;" onclick="if(confirm('Reset everything?'))resetGame()">⚠️ New Game</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /game-body -->
+</div><!-- /game -->
+
+<!-- NOTIFICATIONS -->
+<div id="notif-container"></div>
+
+<!-- BG PARTICLES -->
+<div id="gpfx"></div>
+
+<!-- ENDING SCREEN -->
+<div id="ending" style="display:none;flex-direction:column;">
+  <div class="ending-title" id="ending-title">ICON</div>
+  <div class="ending-sub" id="ending-sub">You became legendary.</div>
+  <div id="ending-stats" style="color:var(--text2);font-size:14px;margin-bottom:28px;line-height:2;"></div>
+  <button class="btn btn-gold btn-lg" onclick="resetGame()">🔄 Play Again</button>
+</div>
+
+<script>
+// ============================================================
+// GAME STATE
+// ============================================================
+let GS = {};
+
+function defaultState(name) {
+  return {
+    artistName: name || "Unknown",
+    week: 1,
+    year: 2004,
+    money: 500,
+    fans: 100,
+    reputation: 20,
+    creativity: 50,
+    confidence: 50,
+    energy: 100,
+    ego: 30,
+    mentalPressure: 10,
+    fashionInfluence: 0,
+    singles: [],
+    albums: [],
+    inProgress: null,
+    studioLevel: 1,
+    producers: [],
+    staff: [],
+    currentTour: null,
+    tourHistory: [],
+    brand: null,
+    fashionDrops: [],
+    socialPosts: [],
+    newsItems: [],
+    charts: [],
+    rivals: [],
+    achievements: [],
+    awards: [],
+    scandals: 0,
+    totalEarnings: 0,
+    weeksPlayed: 0,
+    interviews: 0,
+    endingTriggered: false,
+    flags: {},
+    collabOffers: [],
+    streamingRevenue: 0,
+    fashionRevenue: 0,
+    tourRevenue: 0,
+    chartPeaks: {},
+    cooldowns: { post: 0, interview: 0, invest: 0 },
+  };
+}
+
+// Temp storage for image upload (not persisted to GS until recording starts)
+let _tempCoverImg = null;
+
+// ============================================================
+// CONSTANTS & DATA
+// ============================================================
+const CAREER_LEVELS = [
+  {fans:0,      label:'Unknown',      icon:'😶'},
+  {fans:1000,   label:'Underground',  icon:'🎧'},
+  {fans:10000,  label:'Rising Star',  icon:'⭐'},
+  {fans:100000, label:'Notable',      icon:'🌟'},
+  {fans:500000, label:'Famous',       icon:'💫'},
+  {fans:2000000,label:'Superstar',    icon:'🔥'},
+  {fans:10000000,label:'Legend',      icon:'👑'},
+  {fans:50000000,label:'Icon',        icon:'🌌'},
+];
+
+const GENRES = ['Hip-Hop','Trap','Gospel Rap','R&B','Experimental','Pop Rap','Drill','Conscious Rap','Lo-Fi','Orchestral Rap'];
+
+const CITIES = [
+  {name:'Atlanta',cap:30000},  {name:'New York',cap:50000},
+  {name:'Los Angeles',cap:50000}, {name:'Chicago',cap:35000},
+  {name:'Houston',cap:28000},  {name:'Detroit',cap:22000},
+  {name:'Miami',cap:30000},    {name:'London',cap:40000},
+  {name:'Paris',cap:35000},    {name:'Tokyo',cap:45000},
+  {name:'Toronto',cap:28000},  {name:'Berlin',cap:30000},
+];
+
+const VENUE_DATA = {
+  club:    {cap:500,   ticket:5,   cost:200,   reqFans:0},
+  theater: {cap:2000,  ticket:25,  cost:800,   reqFans:1000},
+  arena:   {cap:15000, ticket:75,  cost:5000,  reqFans:50000},
+  stadium: {cap:60000, ticket:150, cost:20000, reqFans:1000000},
+};
+
+const PRODUCERS = [
+  {id:'rookie', name:'Lil Beatbox',     icon:'🎧', bonus:5,  cost:300,  desc:'+5 Quality'},
+  {id:'mid',    name:'Wavvy Prodz',     icon:'🎹', bonus:12, cost:1200, desc:'+12 Quality'},
+  {id:'top',    name:'DJ Phantom',      icon:'🎛️', bonus:22, cost:5000, desc:'+22 Quality'},
+  {id:'legend', name:'God Tier Beats',  icon:'🔥', bonus:35, cost:25000,desc:'+35 Quality'},
+];
+
+const STAFF_OPTIONS = [
+  {id:'manager',   name:'Manager',   icon:'👔', bonus:'rep',  val:5,  cost:500},
+  {id:'lawyer',    name:'Lawyer',    icon:'⚖️', bonus:'scandal',val:20,cost:2000},
+  {id:'pr',        name:'PR Agent',  icon:'📣', bonus:'fans', val:200,cost:1500},
+  {id:'engineer',  name:'Engineer',  icon:'🔊', bonus:'qual', val:8,  cost:1000},
+  {id:'stylist',   name:'Stylist',   icon:'💄', bonus:'fashion',val:5, cost:800},
+  {id:'bodyguard', name:'Bodyguard', icon:'🕶️', bonus:'ego', val:3,  cost:600},
+  {id:'social',    name:'Social Mgr',icon:'📱', bonus:'fans', val:500,cost:2500},
+  {id:'agent',     name:'Booking Agent',icon:'🗓️',bonus:'tour',val:15,cost:3000},
+];
+
+const STUDIO_LEVELS = [
+  {lv:1, name:'Bedroom Studio',    icon:'🏠', qualBonus:0,  upgradeCost:2000},
+  {lv:2, name:'Home Studio',       icon:'🎙️', qualBonus:10, upgradeCost:8000},
+  {lv:3, name:'Pro Studio',        icon:'🎛️', qualBonus:20, upgradeCost:30000},
+  {lv:4, name:'Recording Palace',  icon:'🏛️', qualBonus:35, upgradeCost:120000},
+  {lv:5, name:'Legendary Complex', icon:'🌌', qualBonus:50, upgradeCost:null},
+];
+
+const RIVAL_POOL = [
+  {name:'Yung Phantom',    icon:'👻', style:'Trap'},
+  {name:'Lil Thunder',     icon:'⚡', style:'Drill'},
+  {name:'K. West Jr.',     icon:'🎵', style:'Hip-Hop'},
+  {name:'MC Voltage',      icon:'🔌', style:'Conscious Rap'},
+  {name:'Flow God',        icon:'🌊', style:'R&B'},
+  {name:'Dollar Sign',     icon:'💲', style:'Pop Rap'},
+  {name:'Big Karma',       icon:'🔱', style:'Gospel Rap'},
+  {name:'NxNorth',         icon:'❄️', style:'Experimental'},
+  {name:'Ray Diamonds',    icon:'💎', style:'Trap'},
+  {name:'Astro Kid',       icon:'🚀', style:'Hip-Hop'},
+];
+
+const FASHION_PRODUCTS = [
+  {id:'hoodie',  name:'Oversized Hoodie', icon:'👕', cost:50,  revenue:120, weeks:2},
+  {id:'shoes',   name:'Designer Sneakers',icon:'👟', cost:200, revenue:500, weeks:4},
+  {id:'jacket',  name:'Leather Jacket',   icon:'🧥', cost:150, revenue:380, weeks:3},
+  {id:'tee',     name:'Graphic Tee',      icon:'👚', cost:20,  revenue:60,  weeks:1},
+  {id:'cap',     name:'Signature Cap',    icon:'🧢', cost:30,  revenue:80,  weeks:1},
+  {id:'pants',   name:'Designer Pants',   icon:'👖', cost:100, revenue:250, weeks:3},
+];
+
+const ACHIEVEMENTS_DEF = [
+  {id:'first_single',  name:'First Drop',       icon:'🎵', desc:'Release your first single',     check: g=>g.singles.length>=1},
+  {id:'first_album',   name:'Album Mode',        icon:'💿', desc:'Release your first album',      check: g=>g.albums.length>=1},
+  {id:'gold_track',    name:'Going Gold',        icon:'🥇', desc:'Get a track to chart #1',       check: g=>Object.values(g.chartPeaks||{}).some(p=>p===1)},
+  {id:'ten_k_fans',    name:'10K Gang',          icon:'👥', desc:'Reach 10,000 fans',             check: g=>g.fans>=10000},
+  {id:'hundred_k',     name:'Six Figures',       icon:'💯', desc:'Reach 100K fans',               check: g=>g.fans>=100000},
+  {id:'million_fans',  name:'Millionaire Status',icon:'💫', desc:'Reach 1 million fans',          check: g=>g.fans>=1000000},
+  {id:'rich',          name:'Money Bags',        icon:'💰', desc:'Have $100,000 at once',         check: g=>g.money>=100000},
+  {id:'first_tour',    name:'On The Road',       icon:'🚌', desc:'Complete your first tour',      check: g=>g.tourHistory.length>=1},
+  {id:'stadium',       name:'Stadium Filler',    icon:'🏟️', desc:'Sell out a stadium',            check: g=>g.flags.soldOutStadium},
+  {id:'fashion_brand', name:'Fashion Forward',   icon:'👗', desc:'Launch a clothing brand',       check: g=>g.brand!==null},
+  {id:'fashion_empire',name:'Fashion Empire',    icon:'💎', desc:'Earn $50K from fashion',        check: g=>g.fashionRevenue>=50000},
+  {id:'controversy',   name:'Cancel Me',         icon:'🌀', desc:'Survive 5 scandals',            check: g=>g.scandals>=5},
+  {id:'comeback',      name:'Comeback King',     icon:'👑', desc:'Rise from 0 reputation',        check: g=>g.flags.comeback},
+  {id:'legend_level',  name:'Legend Status',     icon:'🌌', desc:'Reach Legend career level',     check: g=>g.fans>=10000000},
+  {id:'five_albums',   name:'Prolific Artist',   icon:'🎼', desc:'Release 5 albums',              check: g=>g.albums.length>=5},
+  {id:'collab_king',   name:'Collab King',       icon:'🤝', desc:'Release 3 collabs',             check: g=>g.singles.filter(s=>s.type==='collab').length>=3},
+  {id:'interviews',    name:'Media Darling',     icon:'📺', desc:'Give 10 interviews',            check: g=>g.interviews>=10},
+  {id:'top_producer',  name:'Beat God',          icon:'🎹', desc:'Hire the top producer',         check: g=>g.producers.includes('legend')},
+  {id:'max_studio',    name:'Palace of Sound',   icon:'🏛️', desc:'Upgrade studio to max level',  check: g=>g.studioLevel>=5},
+  {id:'icon',          name:'Iconic',            icon:'🌟', desc:'Reach Icon career level',       check: g=>g.fans>=50000000},
+];
+
+const SCANDAL_POOL = [
+  "said something unhinged in an interview",
+  "went on a late-night rant on social media",
+  "showed up 3 hours late to a concert",
+  "got into beef with a rival artist",
+  "wore a controversial outfit to an award show",
+  "claimed to be the greatest of all time",
+  "stormed off stage mid-performance",
+  "went on a Twitter spree and deleted it all",
+  "feuded with a famous designer",
+  "made bold political statements",
+];
+
+const POSITIVE_EVENTS = [
+  {msg:"Your song got placed in a major movie! 🎬", fans:()=>rand(5000,20000), money:()=>rand(20000,80000)},
+  {msg:"A sports star used your track at a championship! 🏆", fans:()=>rand(2000,8000), money:()=>0},
+  {msg:"Viral dance challenge based on your song! 💃", fans:()=>rand(10000,40000), money:()=>rand(5000,20000)},
+  {msg:"A legend co-signed you publicly! 👑", fans:()=>rand(3000,15000), money:()=>0, rep:5},
+  {msg:"Your fashion line got featured in a major magazine! 📰", fans:()=>rand(1000,5000), money:()=>rand(5000,25000), fashion:10},
+  {msg:"Streaming numbers explode on your old track! 📈", fans:()=>rand(500,3000), money:()=>rand(2000,10000)},
+  {msg:"You won an underground music award! 🎖️", fans:()=>rand(1000,4000), money:()=>0, rep:3},
+  {msg:"A famous DJ played your track at a festival! 🎪", fans:()=>rand(4000,12000), money:()=>0},
+];
+
+const NEGATIVE_EVENTS = [
+  {msg:"Streaming platforms cut your royalty rate! 📉", money:()=>-rand(200,1000)},
+  {msg:"A rival dissed you in their new track! 😤", fans:()=>-rand(0,500), rep:-3},
+  {msg:"Concert venue double-booked — show cancelled! 🚫", money:()=>-rand(500,2000)},
+  {msg:"Your ego caused a falling out with a producer! 😬", rep:-2, ego:5},
+  {msg:"Mental pressure is building up... 😔", pressure:15},
+  {msg:"Equipment failure in the studio! 🔧", money:()=>-rand(300,800)},
+  {msg:"A sample clearance lawsuit costs you! ⚖️", money:()=>-rand(2000,10000)},
+];
+
+const INTERVIEW_QUESTIONS = [
+  {q:"How do you feel about your current success?", opts:[
+    {text:"I'm grateful and blessed 🙏", rep:3, ego:-3, fans:500},
+    {text:"I'm the greatest of all time 👑", rep:-2, ego:8, fans:800},
+    {text:"I'm just getting started 🚀", rep:2, ego:2, fans:600},
+  ]},
+  {q:"What's your creative process like?", opts:[
+    {text:"I pour my soul into every track", rep:2, creativity:3, fans:400},
+    {text:"Pure genius. Can't explain it.", rep:-1, ego:5, fans:300},
+    {text:"I study music history deeply", rep:3, creativity:5, fans:350},
+  ]},
+  {q:"Any beef with rival artists?", opts:[
+    {text:"No comment, I focus on my craft", rep:3, fans:200},
+    {text:"I'll address them in my next album 🔥", rep:-1, fans:1200, scandal:true},
+    {text:"We're cool, music is about unity", rep:4, fans:300},
+  ]},
+  {q:"What's next for your fashion brand?", opts:[
+    {text:"Biggest drop of the year coming soon!", fans:500, fashion:5, money:1000},
+    {text:"I'm redefining street fashion entirely", fans:300, fashion:8, ego:3},
+    {text:"Still figuring it out honestly", rep:2, fans:100},
+  ]},
+  {q:"How do you handle criticism?", opts:[
+    {text:"I don't read reviews", ego:5, rep:-2},
+    {text:"I use it as fuel to be better", rep:5, creativity:3},
+    {text:"Critics don't understand my vision", ego:7, rep:-3, fans:400},
+  ]},
+  {q:"How did you get your start in music?", opts:[
+    {text:"Hard work and late nights in the studio", rep:4, fans:600},
+    {text:"It was destiny — I was born for this", ego:4, fans:400},
+    {text:"I had nothing else, music was all I had", rep:6, fans:800, creativity:2},
+  ]},
+];
+
+const SOCIAL_TOPICS = [
+  "the state of hip-hop", "my new sound", "my critics",
+  "fashion and identity", "late nights in the studio",
+  "what success really means", "haters", "God and purpose",
+  "the music industry", "my legacy",
+];
+
+const COVER_COLORS = [
+  '#FFD700','#FF2D78','#00F5FF','#8B5CF6','#FF6B00',
+  '#00FF88','#FF0000','#FFFFFF','#000000','#4444FF',
+];
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+function startGame() {
+  const name = document.getElementById('name-input').value.trim() || 'Young Pablo';
+  GS = defaultState(name);
+  GS.rivals = generateRivals();
+  GS.charts = generateInitialCharts();
+  generateInterview();
+
+  document.getElementById('splash').style.animation = 'fadeIn 0.4s ease reverse';
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    const game = document.getElementById('game');
+    game.style.display = 'flex';
+    generateBgParticles();
+    initCoverColors();
+    initCitySelector();
+    renderAll();
+    notify('🎵', `Welcome, <strong>${name}</strong>! Your journey to the top begins NOW.`, 'epic');
+    notify('💡', 'Tip: Record a single first, then advance weeks to grow your career.', 'info');
+    autoSave();
+  }, 400);
+}
+
+function generateRivals() {
+  const pool = [...RIVAL_POOL].sort(()=>Math.random()-0.5);
+  return pool.slice(0,5).map(r => ({
+    ...r,
+    fans: rand(1000, 200000),
+    albums: rand(0,4),
+    hot: Math.random() > 0.5,
+  }));
+}
+
+function generateInitialCharts() {
+  const rivalNames = GS.rivals ? GS.rivals.map(r=>r.name) : [];
+  const fakeArtists = ['Lil Nova','Big Waves','MC Ghost','The Storm','Phantom Jay','Future Shade','Ace King'];
+  const allArtists = [...fakeArtists, ...rivalNames].sort(()=>Math.random()-0.5);
+  const titles = ['Drip Season','No Cap','The Wave','Level Up','Grind All Day','Ghost Flow','Crown Up','Blaze','Pure Gold','Neon Dreams'];
+  return Array.from({length:10},(_,i)=>({
+    rank: i+1,
+    title: titles[i] || `Track ${i+1}`,
+    artist: allArtists[i % allArtists.length],
+    pts: 100 - i * 9,
+    isPlayer: false,
+  }));
+}
+
+function generateBgParticles() {
+  const c = document.getElementById('gpfx');
+  for(let i=0;i<20;i++){
+    const p = document.createElement('div');
+    p.className='gp';
+    const size = rand(2,5);
+    const colors = ['rgba(255,215,0,0.4)','rgba(139,92,246,0.3)','rgba(0,245,255,0.3)'];
+    p.style.cssText=`
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[rand(0,2)]};
+      animation-duration:${rand(8,20)}s;
+      animation-delay:${-rand(0,20)}s;
+    `;
+    c.appendChild(p);
+  }
+}
+
+function initCoverColors() {
+  const ct = document.getElementById('cover-colors');
+  ct.innerHTML = '';
+  COVER_COLORS.forEach((c,i) => {
+    const el = document.createElement('div');
+    el.className = 'color-opt' + (i===0?' sel':'');
+    el.style.background = c;
+    el.dataset.color = c;
+    el.onclick = () => {
+      document.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('sel'));
+      el.classList.add('sel');
+    };
+    ct.appendChild(el);
+  });
+}
+
+function initCitySelector() {
+  const c = document.getElementById('city-selector');
+  c.innerHTML = '';
+  CITIES.forEach(city => {
+    const btn = document.createElement('div');
+    btn.className = 'city-btn';
+    btn.dataset.city = city.name;
+    btn.innerHTML = `<div class="city-name">${city.name}</div><div class="city-cap">${formatNum(city.cap)} cap</div>`;
+    btn.onclick = () => { btn.classList.toggle('sel'); updateTourPreview(); };
+    c.appendChild(btn);
+  });
+}
+
+function getSelectedCities() {
+  return [...document.querySelectorAll('.city-btn.sel')].map(b=>b.dataset.city);
+}
+
+function updateTourPreview() {
+  const cities = getSelectedCities();
+  const venueKey = document.getElementById('tour-venue')?.value || 'club';
+  const venue = VENUE_DATA[venueKey];
+  const est = cities.length * venue.cap * venue.ticket * 0.6;
+  document.getElementById('tour-preview').innerHTML =
+    cities.length
+      ? `📍 ${cities.length} cities • Est. Revenue: <strong style="color:var(--gold)">$${formatNum(Math.round(est))}</strong> • Duration: ${cities.length} weeks`
+      : 'Select cities to preview tour revenue';
+}
+
+// ============================================================
+// RENDERING SYSTEMS
+// ============================================================
+function renderAll() {
+  updateHUD();
+  renderDashboard();
+  renderMusicTab();
+  renderStudioTab();
+  renderTourTab();
+  renderFashionTab();
+  renderSocialTab();
+  renderWorldTab();
+  renderAwardsTab();
+  renderSaveTab();
+}
+
+function updateHUD() {
+  document.getElementById('h-money').textContent = formatMoney(GS.money);
+  document.getElementById('h-fans').textContent = formatNum(GS.fans);
+  document.getElementById('h-rep').textContent = GS.reputation;
+  document.getElementById('h-energy').textContent = GS.energy;
+  document.getElementById('h-create').textContent = GS.creativity;
+  document.getElementById('h-ego').textContent = GS.ego;
+  document.getElementById('h-week').textContent = `WEEK ${GS.week} • ${GS.year}`;
+  const lvl = getCareerLevel();
+  document.getElementById('sb-avatar').textContent = lvl.icon;
+  document.getElementById('sb-name').textContent = GS.artistName;
+  document.getElementById('sb-title').textContent = lvl.label.toUpperCase();
+}
+
+function renderDashboard() {
+  // Stats
+  const stats = [
+    {label:'Creativity',  val:GS.creativity,  max:100, color:'#8B5CF6'},
+    {label:'Confidence',  val:GS.confidence,  max:100, color:'#00f5ff'},
+    {label:'Energy',      val:GS.energy,      max:100, color:'#00ff88'},
+    {label:'Ego',         val:GS.ego,         max:100, color:'#FFD700'},
+    {label:'Reputation',  val:GS.reputation,  max:100, color:'#ff2d78'},
+    {label:'Mental Press',val:GS.mentalPressure,max:100,color:'#ff4444'},
+    {label:'Fashion Inf', val:GS.fashionInfluence,max:100,color:'#FFA500'},
+  ];
+  document.getElementById('stats-display').innerHTML = stats.map(s=>`
+    <div class="sbar-wrap">
+      <div class="sbar-label"><span>${s.label}</span><span>${Math.round(s.val)}</span></div>
+      <div class="sbar-track"><div class="sbar-fill" style="width:${Math.min(100,(s.val/s.max)*100)}%;background:${s.color};"></div></div>
+    </div>
+  `).join('');
+
+  // Quick Actions
+  if(!GS.cooldowns) GS.cooldowns = { post:0, interview:0, invest:0 };
+  const postOnCD = GS.week < (GS.cooldowns.post||0);
+  const intOnCD  = GS.week < (GS.cooldowns.interview||0);
+  const invOnCD  = GS.week < (GS.cooldowns.invest||0);
+  const qa = [
+    {icon:'🎙️',name:'Record Single',cost:'⚡20 Energy',action:"startRecording_quick('single')",disabled:GS.energy<20||GS.inProgress,cd:null},
+    {icon:'🎵',name:'Record Album', cost:'⚡40 Energy',action:"startRecording_quick('album')", disabled:GS.energy<40||GS.inProgress,cd:null},
+    {icon:'😴',name:'Rest',         cost:'Restore Energy',action:"doRest()",                  disabled:GS.energy>=100,             cd:null},
+    {icon:'📱',name:'Social Post',  cost: postOnCD?`⏳ ${(GS.cooldowns.post||0)-GS.week}wk`:'Write & Post',
+     action:"showTab('social')",disabled:false,cd:postOnCD},
+    {icon:'🎤',name:'Interview',    cost: intOnCD?`⏳ ${(GS.cooldowns.interview||0)-GS.week}wk`:'⚡15 Energy',
+     action:"doInterview()",disabled:GS.energy<15,cd:intOnCD},
+    {icon:'💸',name:'Invest',       cost: invOnCD?`⏳ ${(GS.cooldowns.invest||0)-GS.week}wk`:'Risk $$',
+     action:"doInvest()",disabled:GS.money<500,cd:invOnCD},
+  ];
+  document.getElementById('quick-actions').innerHTML = qa.map(a=>`
+    <div class="qaction" onclick="${(a.disabled||a.cd)?'':a.action}"
+      style="${(a.disabled||a.cd)?'opacity:0.38;cursor:not-allowed;':''};${a.cd?'border-color:rgba(255,45,120,0.3);':''}" >
+      <div class="qa-icon">${a.icon}</div>
+      <div class="qa-name" style="${a.cd?'color:var(--pink);':''}">${a.name}</div>
+      <div class="qa-cost" style="${a.cd?'color:var(--pink);':''}">${a.cost}</div>
+    </div>
+  `).join('');
+
+  // News
+  const newsFeed = document.getElementById('news-dash');
+  if(GS.newsItems.length === 0){
+    newsFeed.innerHTML = '<div class="empty"><div class="ei">📰</div><div class="et">No news yet. Start making moves!</div></div>';
+  } else {
+    newsFeed.innerHTML = GS.newsItems.slice(-8).reverse().map(n=>`
+      <div class="news-item-full">
+        <div class="news-emoji">${n.icon||'📰'}</div>
+        <div><div class="news-txt">${n.text}</div><div class="news-time">Week ${n.week}</div></div>
+      </div>
+    `).join('');
+  }
+
+  // In Progress
+  const ipd = document.getElementById('in-progress-dash');
+  if(GS.inProgress){
+    const ip = GS.inProgress;
+    const pct = Math.round(((ip.totalWeeks-ip.weeksLeft)/ip.totalWeeks)*100);
+    ipd.innerHTML = `
+      <div class="in-progress">
+        <div class="prog-dot"></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;">${ip.title}</div>
+          <div style="font-size:11px;color:var(--text2);">${ip.type} • ${ip.weeksLeft} week(s) left</div>
+          <div class="lbar"><div class="lbar-fill" style="width:${pct}%;"></div></div>
+        </div>
+        <div style="font-size:11px;color:var(--cyan);">${pct}%</div>
+      </div>
+    `;
+  } else {
+    ipd.innerHTML = '<div class="empty"><div class="ei">🎙️</div><div class="et">Nothing recording. Head to Music tab!</div></div>';
+  }
+
+  // Career Progress Bar
+  const cur = getCareerLevel();
+  const nextIdx = CAREER_LEVELS.findIndex(l=>l.fans===cur.fans) + 1;
+  const next = CAREER_LEVELS[nextIdx];
+  const pct = next ? Math.min(100,((GS.fans-cur.fans)/(next.fans-cur.fans))*100) : 100;
+  document.getElementById('career-bar-display').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div style="font-size:32px;">${cur.icon}</div>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:16px;color:var(--gold);">${cur.label}</div>
+        <div style="font-size:12px;color:var(--text2);">${formatNum(GS.fans)} fans${next?` • Next: ${formatNum(next.fans)} for ${next.label}`:' • MAXIMUM ACHIEVED'}</div>
+      </div>
+    </div>
+    <div class="sbar-track" style="height:8px;">
+      <div class="sbar-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--pink));"></div>
+    </div>
+  `;
+}
+
+function renderMusicTab() {
+  // In progress
+  const mip = document.getElementById('music-inprogress');
+  if(GS.inProgress){
+    const ip = GS.inProgress;
+    const pct = Math.round(((ip.totalWeeks-ip.weeksLeft)/ip.totalWeeks)*100);
+    mip.innerHTML = `
+      <div class="in-progress" style="margin-bottom:0;">
+        <div class="prog-dot"></div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;">${ip.title} <span class="tag tag-cyan">${ip.type}</span></div>
+          <div style="font-size:11px;color:var(--text2);">${ip.genre} • ${ip.weeksLeft} week(s) remaining</div>
+          <div class="lbar"><div class="lbar-fill" style="width:${pct}%;"></div></div>
+        </div>
+        <div style="font-size:11px;color:var(--cyan);">${pct}%</div>
+      </div>
+    `;
+  } else {
+    mip.innerHTML = '<div style="text-align:center;color:var(--text2);font-size:13px;padding:12px;">No active recording.</div>';
+  }
+
+  // Discography
+  const disco = document.getElementById('discography');
+  const allMusic = [...GS.albums, ...GS.singles].sort((a,b)=>b.week-a.week);
+  if(allMusic.length===0){
+    disco.innerHTML = '<div class="empty"><div class="ei">💿</div><div class="et">No releases yet.</div></div>';
+  } else {
+    disco.innerHTML = allMusic.map((m,idx)=>{
+      const coverStyle = m.coverImg
+        ? `background:url('${m.coverImg}') center/cover no-repeat;`
+        : getCoverStyle(m);
+      const hasTracklist = m.tracklist && m.tracklist.length > 1;
+      const tlId = `tl-expand-${idx}`;
+      return `
+        <div class="card" style="cursor:default;">
+          <div style="display:flex;gap:12px;align-items:center;">
+            <div class="album-cover" style="width:52px;height:52px;margin:0;${coverStyle};border-radius:6px;flex-shrink:0;"></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.title}</div>
+              <div style="font-size:11px;color:var(--text2);">${m.genre} • ${m.type}${m.tracks>1?' • '+m.tracks+' tracks':''}</div>
+              <div style="font-size:11px;margin-top:2px;display:flex;align-items:center;gap:6px;">
+                <span class="tag ${m.chartPos<=10?'tag-gold':m.chartPos<=40?'tag-green':'tag-cyan'}">#${m.chartPos}</span>
+                <span style="color:var(--text2);">Q: ${m.quality}</span>
+                ${hasTracklist ? `<button class="disco-expand-btn" onclick="toggleTracklist('${tlId}')">▼ Tracks</button>` : ''}
+              </div>
+            </div>
+            <div style="text-align:right;font-size:11px;color:var(--text2);">
+              <div style="color:var(--green);">+${formatNum(m.fansGained)}</div>
+              <div>Wk ${m.week}</div>
+            </div>
+          </div>
+          ${hasTracklist ? `
+            <div class="tracklist-expand" id="${tlId}">
+              ${m.tracklist.map((t,i)=>`
+                <div class="tl-track-row">
+                  <span class="tl-num">${i+1}</span>
+                  <span class="tl-name">${t}</span>
+                  <span class="tl-qual">${Math.min(100,Math.max(30,m.quality+rand(-12,12)))}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function renderStudioTab() {
+  const sl = STUDIO_LEVELS[GS.studioLevel-1];
+  document.getElementById('studio-display').innerHTML = `
+    <div class="studio-icon">${sl.icon}</div>
+    <div class="studio-lv">LEVEL ${GS.studioLevel}</div>
+    <div class="studio-name">${sl.name}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:6px;">Quality Bonus: +${sl.qualBonus}</div>
+  `;
+
+  // Upgrades
+  const upgEl = document.getElementById('studio-upgrades');
+  const next = STUDIO_LEVELS[GS.studioLevel];
+  if(next){
+    upgEl.innerHTML = `
+      <div class="card" style="margin-bottom:10px;">
+        <div style="font-size:22px;margin-bottom:6px;">${next.icon}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--gold);">${next.name}</div>
+        <div style="font-size:12px;color:var(--text2);margin:6px 0;">+${next.qualBonus} quality bonus on all recordings</div>
+        <button class="btn btn-gold btn-full" onclick="upgradeStudio()" ${GS.money<sl.upgradeCost?'disabled':''}>
+          Upgrade — ${formatMoney(sl.upgradeCost)}
+        </button>
+      </div>
+    `;
+  } else {
+    upgEl.innerHTML = '<div class="empty"><div class="ei">🌌</div><div class="et">Maximum studio level reached!</div></div>';
+  }
+
+  // Producers
+  const prodEl = document.getElementById('producers-panel');
+  prodEl.innerHTML = '<div class="scroll-list">' + PRODUCERS.map(p=>`
+    <div class="prod-card">
+      <div class="prod-icon">${p.icon}</div>
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-bonus">${p.desc}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <div class="prod-cost">${formatMoney(p.cost)}</div>
+        ${GS.producers.includes(p.id)
+          ? '<span class="tag tag-green">✓ Hired</span>'
+          : `<button class="btn btn-sm btn-purple" onclick="hireProducer('${p.id}')" ${GS.money<p.cost?'disabled':''}>Hire</button>`
+        }
+      </div>
+    </div>
+  `).join('') + '</div>';
+
+  // Staff
+  const staffEl = document.getElementById('staff-panel');
+  staffEl.innerHTML = STAFF_OPTIONS.map(s=>`
+    <div class="card" style="text-align:center;">
+      <div style="font-size:22px;margin-bottom:6px;">${s.icon}</div>
+      <div style="font-size:12px;font-weight:700;">${s.name}</div>
+      <div style="font-size:10px;color:var(--text2);margin:4px 0;">${formatMoney(s.cost)}</div>
+      ${GS.staff.includes(s.id)
+        ? '<span class="tag tag-green">✓ Hired</span>'
+        : `<button class="btn btn-sm btn-ghost btn-full" onclick="hireStaff('${s.id}')" ${GS.money<s.cost?'disabled':''}>Hire</button>`
+      }
+    </div>
+  `).join('');
+}
+
+function renderTourTab() {
+  // Active tour
+  const atd = document.getElementById('tour-active-display');
+  if(GS.currentTour){
+    const t = GS.currentTour;
+    const done = t.cities.filter(c=>c.done);
+    const pct = Math.round((done.length/t.cities.length)*100);
+    atd.innerHTML = `
+      <div class="panel" style="background:rgba(0,245,255,0.04);border-color:rgba(0,245,255,0.3);">
+        <div class="panel-title">🚌 ACTIVE TOUR: ${t.name}</div>
+        <div class="grid-2">
+          <div>
+            <div style="font-size:13px;color:var(--text2);">${done.length}/${t.cities.length} shows complete</div>
+            <div class="lbar" style="margin-top:8px;height:6px;"><div class="lbar-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--cyan),var(--green));"></div></div>
+            <div style="margin-top:10px;">
+              ${t.cities.map((c,i)=>`
+                <div class="tstop">
+                  <div class="tstop-num" style="${c.done?'background:rgba(0,255,136,0.2);border-color:var(--green);color:var(--green);':''}">
+                    ${c.done?'✓':(i+1)}
+                  </div>
+                  <div style="flex:1;font-size:13px;">${c.name}</div>
+                  <div style="font-size:11px;color:${c.done?'var(--green)':'var(--text2)'};">
+                    ${c.done?`+${formatMoney(c.earned)}`:'Upcoming'}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div>
+            <div class="sbar-wrap"><div class="sbar-label"><span>Tour Revenue</span><span style="color:var(--green);">${formatMoney(t.totalEarned||0)}</span></div></div>
+            <div class="sbar-wrap"><div class="sbar-label"><span>Fans Gained</span><span style="color:var(--cyan);">${formatNum(t.fansGained||0)}</span></div></div>
+            <div style="margin-top:14px;">
+              <button class="btn btn-cyan btn-full" onclick="performConcert()">🎤 Perform Next Show</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    atd.innerHTML = '';
+  }
+
+  // Tour history
+  const th = document.getElementById('tour-history');
+  if(GS.tourHistory.length===0){
+    th.innerHTML = '<div class="empty"><div class="ei">🌍</div><div class="et">No completed tours yet.</div></div>';
+  } else {
+    th.innerHTML = GS.tourHistory.map(t=>`
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;">${t.name}</div>
+        <div style="font-size:11px;color:var(--text2);">${t.cities.length} cities • ${t.venue}</div>
+        <div style="display:flex;gap:12px;margin-top:6px;">
+          <div class="tag tag-green">${formatMoney(t.totalEarned)}</div>
+          <div class="tag tag-cyan">+${formatNum(t.fansGained)} fans</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('tour-venue')?.addEventListener('change', updateTourPreview);
+  updateTourPreview();
+}
+
+function renderFashionTab() {
+  const bd = document.getElementById('fashion-brand-display');
+  if(GS.brand){
+    bd.innerHTML = `
+      <div class="panel" style="background:linear-gradient(135deg,rgba(255,165,0,0.06),rgba(139,92,246,0.04));border-color:rgba(255,215,0,0.3);">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-size:40px;">${GS.brand.icon}</div>
+          <div>
+            <div style="font-family:'Orbitron',monospace;font-size:20px;color:var(--gold);">${GS.brand.name}</div>
+            <div style="font-size:13px;color:var(--cyan);">Fashion Influence: ${Math.round(GS.fashionInfluence)}/100</div>
+            <div style="font-size:13px;color:var(--green);">Total Revenue: ${formatMoney(GS.fashionRevenue)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    bd.innerHTML = '';
+  }
+
+  const fc = document.getElementById('fashion-create');
+  if(!GS.brand){
+    fc.innerHTML = `
+      <div class="fg">
+        <label class="flabel">Brand Name</label>
+        <input class="finput" id="brand-name" type="text" placeholder="Name your empire..." maxlength="30">
+      </div>
+      <div class="fg">
+        <label class="flabel">Brand Vibe</label>
+        <select class="fselect" id="brand-vibe">
+          <option>Streetwear</option>
+          <option>High Fashion</option>
+          <option>Athletic</option>
+          <option>Avant-Garde</option>
+          <option>Luxury</option>
+        </select>
+      </div>
+      <button class="btn btn-gold btn-full" onclick="launchBrand()">🏷️ Launch Brand</button>
+    `;
+  } else {
+    fc.innerHTML = `
+      <div class="panel-title" style="margin-bottom:10px;">Create New Drop</div>
+      <div class="grid-2">
+        ${FASHION_PRODUCTS.map(p=>`
+          <div class="fproduct">
+            <div class="fprod-icon">${p.icon}</div>
+            <div class="fprod-name">${p.name}</div>
+            <div style="font-size:11px;color:var(--text2);">Cost: ${formatMoney(p.cost)} • Takes ${p.weeks} wk</div>
+            <button class="btn btn-sm btn-gold btn-full" style="margin-top:8px;" onclick="launchDrop('${p.id}')" ${GS.money<p.cost||GS.fashionDrops.find(d=>d.id===p.id&&!d.done)?'disabled':''}>
+              ${GS.fashionDrops.find(d=>d.id===p.id&&!d.done)?'In Production':'Drop It'}
+            </button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // Active fashion products
+  const fp = document.getElementById('fashion-products');
+  const activeDrops = GS.fashionDrops.filter(d=>d.done);
+  if(activeDrops.length===0){
+    fp.innerHTML = '<div class="empty"><div class="ei">👗</div><div class="et">No products selling yet.</div></div>';
+  } else {
+    fp.innerHTML = activeDrops.map(d=>`
+      <div class="fproduct">
+        <div class="fprod-icon">${d.icon}</div>
+        <div class="fprod-name">${d.name}</div>
+        <div class="fprod-sales">🔥 ${d.weeksActive||1} weeks active</div>
+        <div class="fprod-revenue">${formatMoney(d.weeklyRevenue)}/week</div>
+      </div>
+    `).join('');
+  }
+
+  // Collab offers
+  const coff = document.getElementById('fashion-collabs');
+  if(GS.collabOffers && GS.collabOffers.length > 0){
+    coff.innerHTML = GS.collabOffers.map((o,i)=>`
+      <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="font-size:28px;">${o.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;">${o.brand} × ${GS.artistName}</div>
+          <div style="font-size:11px;color:var(--text2);">${o.desc}</div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm btn-gold" onclick="acceptCollab(${i})">Accept</button>
+          <button class="btn btn-sm btn-ghost" onclick="declineCollab(${i})">Pass</button>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    coff.innerHTML = '<div style="color:var(--text2);font-size:13px;">No offers yet. Grow your brand!</div>';
+  }
+}
+
+function renderSocialTab() {
+  if(!GS.cooldowns) GS.cooldowns = { post:0, interview:0, invest:0 };
+  const postCD = GS.cooldowns.post || 0;
+  const intCD = GS.cooldowns.interview || 0;
+  const postOnCD = GS.week < postCD;
+  const intOnCD = GS.week < intCD;
+  const postWeeksLeft = postCD - GS.week;
+  const intWeeksLeft = intCD - GS.week;
+
+  // Cooldown display for posting
+  const pcd = document.getElementById('post-cooldown-display');
+  if(pcd){
+    if(postOnCD){
+      pcd.innerHTML = `<span class="cd-timer">⏳ Post cooldown — ${postWeeksLeft} week(s) remaining</span>`;
+    } else {
+      pcd.innerHTML = `<span class="cd-ready">✓ Ready to post</span>`;
+    }
+  }
+
+  // Disable / enable post buttons
+  ['btn-post-normal','btn-post-contro','btn-post-humble'].forEach(id=>{
+    const btn = document.getElementById(id);
+    if(btn) btn.disabled = postOnCD;
+  });
+
+  // Cooldown display for interview
+  const icd = document.getElementById('interview-cooldown-display');
+  if(icd){
+    if(intOnCD){
+      icd.innerHTML = `<span class="cd-timer">⏳ Interview cooldown — ${intWeeksLeft} week(s) remaining</span>`;
+    } else {
+      icd.innerHTML = `<span class="cd-ready">✓ Interview available</span>`;
+    }
+  }
+
+  // Render interview (hide choices if on cooldown)
+  renderInterview(intOnCD);
+
+  // Social feed
+  const sf = document.getElementById('social-feed');
+  if(GS.socialPosts.length===0){
+    sf.innerHTML = '<div class="empty"><div class="ei">📱</div><div class="et">No posts yet. Write something!</div></div>';
+  } else {
+    sf.innerHTML = GS.socialPosts.slice(-20).reverse().map(p=>{
+      const typeColor = p.type==='controversial'?'var(--pink)':p.type==='humble'?'var(--purple)':'var(--cyan)';
+      const typeLabel = p.type==='controversial'?'🔥 Controversial':p.type==='humble'?'🙏 Humble':'🐦 Normal';
+      return `
+        <div class="spost">
+          <div class="spost-hd">
+            <div class="spost-av">🎤</div>
+            <div>
+              <div class="spost-name">${GS.artistName}</div>
+              <div class="spost-handle" style="color:${typeColor};">${typeLabel}</div>
+            </div>
+            <div class="spost-time">Wk ${p.week}</div>
+          </div>
+          <div class="spost-body">${p.text}</div>
+          <div class="spost-stats">
+            <span>❤️ ${formatNum(p.likes||rand(50,5000))}</span>
+            <span>🔁 ${formatNum(p.retweets||rand(10,1000))}</span>
+            <span>💬 ${formatNum(p.comments||rand(5,300))}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function renderWorldTab() {
+  // News
+  const wn = document.getElementById('world-news');
+  if(GS.newsItems.length===0){
+    wn.innerHTML = '<div class="empty"><div class="ei">📡</div><div class="et">The world is quiet... for now.</div></div>';
+  } else {
+    wn.innerHTML = GS.newsItems.slice(-20).reverse().map(n=>`
+      <div class="news-item-full">
+        <div class="news-emoji">${n.icon||'📰'}</div>
+        <div style="flex:1;">
+          <div class="news-txt">${n.text}</div>
+          <div class="news-time">Week ${n.week} • ${GS.year}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Charts
+  const mc = document.getElementById('music-charts');
+  mc.innerHTML = GS.charts.slice(0,10).map(c=>`
+    <div class="chart-row">
+      <div class="chart-rank">#${c.rank}</div>
+      <div class="chart-info">
+        <div class="chart-title" style="${c.isPlayer?'color:var(--gold);':''}">${c.title}</div>
+        <div class="chart-artist">${c.artist}</div>
+      </div>
+      <div class="chart-pts">${c.pts}pts</div>
+    </div>
+  `).join('');
+
+  // Rivals
+  const rp = document.getElementById('rivals-panel');
+  rp.innerHTML = GS.rivals.map(r=>`
+    <div class="rival-card">
+      <div class="rival-av" style="background:rgba(255,45,120,0.1);">${r.icon}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;">${r.name}</div>
+        <div style="font-size:11px;color:var(--text2);">${r.style} • ${formatNum(r.fans)} fans</div>
+        <div style="font-size:11px;margin-top:3px;">
+          <span class="tag ${r.hot?'tag-pink':'tag-cyan'}">${r.hot?'🔥 Hot':'📉 Cold'}</span>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-pink" onclick="beefRival('${r.name}')">🥊 Beef</button>
+    </div>
+  `).join('');
+}
+
+function renderAwardsTab() {
+  // Awards
+  const ad = document.getElementById('awards-display');
+  if(GS.awards.length===0){
+    ad.innerHTML = '<div class="empty" style="grid-column:1/-1;"><div class="ei">🏆</div><div class="et">No awards yet. Make some hits!</div></div>';
+  } else {
+    ad.innerHTML = GS.awards.map(a=>`
+      <div class="award-card">
+        <div class="award-icon">${a.icon}</div>
+        <div class="award-name">${a.name}</div>
+        <div class="award-desc">${a.desc}</div>
+      </div>
+    `).join('');
+  }
+
+  // Achievements
+  const ach = document.getElementById('achievements-display');
+  ach.innerHTML = ACHIEVEMENTS_DEF.map(a=>{
+    const unlocked = GS.achievements.includes(a.id);
+    return `
+      <div class="ach ${unlocked?'unlocked':'locked'}">
+        <div class="ach-icon">${a.icon}</div>
+        <div>
+          <div class="ach-name">${a.name}</div>
+          <div class="ach-desc">${a.desc}</div>
+        </div>
+        ${unlocked?'<span class="tag tag-gold">✓</span>':''}
+      </div>
+    `;
+  }).join('');
+
+  // Career stats
+  const csd = document.getElementById('career-stats-display');
+  csd.innerHTML = [
+    {label:'Total Fans',val:formatNum(GS.fans),icon:'👥'},
+    {label:'Total Money Made',val:formatMoney(GS.totalEarnings),icon:'💰'},
+    {label:'Albums Released',val:GS.albums.length,icon:'💿'},
+    {label:'Singles Released',val:GS.singles.length,icon:'🎵'},
+    {label:'Tours Completed',val:GS.tourHistory.length,icon:'🌍'},
+    {label:'Scandals Survived',val:GS.scandals,icon:'🌀'},
+    {label:'Weeks Played',val:GS.weeksPlayed,icon:'📅'},
+    {label:'Interviews Given',val:GS.interviews,icon:'🎤'},
+    {label:'Social Posts',val:GS.socialPosts.length,icon:'📱'},
+  ].map(s=>`
+    <div class="card" style="text-align:center;">
+      <div style="font-size:24px;margin-bottom:6px;">${s.icon}</div>
+      <div style="font-family:'Orbitron',monospace;font-size:16px;color:var(--gold);">${s.val}</div>
+      <div style="font-size:11px;color:var(--text2);">${s.label}</div>
+    </div>
+  `).join('');
+}
+
+function renderSaveTab() {
+  const slots = ['slot1','slot2','slot3'];
+  const saveEl = document.getElementById('save-slots');
+  const loadEl = document.getElementById('load-slots');
+  let html = '';
+  slots.forEach(s=>{
+    const data = localStorage.getItem(`pablo_${s}`);
+    if(data){
+      try{
+        const parsed = JSON.parse(data);
+        html += `<div class="card" style="margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:700;">${s.toUpperCase()}: ${parsed.artistName}</div>
+          <div style="font-size:11px;color:var(--text2);">Week ${parsed.week} • ${formatNum(parsed.fans)} fans • ${formatMoney(parsed.money)}</div>
+        </div>`;
+      }catch{html+=`<div class="card" style="margin-bottom:8px;color:var(--text2);font-size:12px;">${s}: Corrupted</div>`;}
+    } else {
+      html += `<div class="card" style="margin-bottom:8px;color:var(--text2);font-size:12px;">${s.toUpperCase()}: Empty</div>`;
+    }
+  });
+  saveEl.innerHTML = loadEl.innerHTML = '';
+  slots.forEach(s=>{
+    const data = localStorage.getItem(`pablo_${s}`);
+    let info = 'Empty';
+    if(data){try{const p=JSON.parse(data);info=`${p.artistName} — Wk ${p.week} • ${formatNum(p.fans)} fans`;}catch{info='Corrupted';}}
+    const div1 = document.createElement('div');
+    div1.className='card';div1.style.marginBottom='8px';
+    div1.innerHTML=`<div style="font-size:12px;color:var(--text2);">${s.toUpperCase()}: ${info}</div>`;
+    saveEl.appendChild(div1);
+    if(data&&info!=='Corrupted'){
+      const div2 = document.createElement('div');
+      div2.className='card';div2.style.marginBottom='8px';
+      div2.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:12px;color:var(--text2);">${info}</div>
+        <button class="btn btn-sm btn-cyan" onclick="loadGame('${s}')">Load</button>
+      </div>`;
+      loadEl.appendChild(div2);
+    }
+  });
+}
+
+// ============================================================
+// MUSIC SYSTEM
+// ============================================================
+let selectedMusicType = 'single';
+
+function setMusicType(t) {
+  selectedMusicType = t;
+  ['single','album','collab'].forEach(k=>{
+    const btn = document.getElementById(`type-${k}`);
+    if(btn){ btn.className = k===t ? 'btn btn-gold' : 'btn btn-ghost'; }
+  });
+  // Adjust default track count
+  const trackSel = document.getElementById('music-tracks');
+  if(trackSel){
+    if(t==='single') trackSel.value='1';
+    else if(t==='album') trackSel.value='10';
+    else trackSel.value='1';
+    onTracksChange();
+  }
+}
+
+function onTracksChange() {
+  const tracks = parseInt(document.getElementById('music-tracks')?.value||'1');
+  const editor = document.getElementById('tracklist-editor');
+  const inputs = document.getElementById('tracklist-inputs');
+  if(!editor||!inputs) return;
+  if(tracks <= 1){
+    editor.style.display = 'none';
+    return;
+  }
+  editor.style.display = 'block';
+  inputs.innerHTML = '';
+  const adjectives = ['Dark','Golden','Neon','Raw','Pure','Deep','High','Cold','Wild','Lost','Broken','Sacred','Final','Bright','Hollow'];
+  const nouns = ['Dreams','Fire','Vibes','Soul','Light','Night','Ghost','Wave','Storm','Crown','Prayer','Heaven','Earth','Sky','Echo'];
+  for(let i=1;i<=tracks;i++){
+    const def = `${adjectives[rand(0,adjectives.length-1)]} ${nouns[rand(0,nouns.length-1)]}`;
+    const row = document.createElement('div');
+    row.className = 'track-input-row';
+    row.innerHTML = `<div class="track-num">${i}</div><input class="track-input" id="track-${i}" type="text" placeholder="${def}" maxlength="50">`;
+    inputs.appendChild(row);
+  }
+}
+
+// Image upload handler
+function handleCoverUpload(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ notify('⚠️','Please upload an image file.','warn'); return; }
+  if(file.size > 5*1024*1024){ notify('⚠️','Image too large (max 5MB).','warn'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _tempCoverImg = e.target.result;
+    const zone = document.getElementById('cover-upload-zone');
+    const status = document.getElementById('cover-upload-status');
+    if(zone){
+      zone.classList.add('has-img');
+      zone.innerHTML = `
+        <input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="handleCoverUpload(event)">
+        <img src="${_tempCoverImg}" alt="Cover">
+        <div class="uz-clear" onclick="clearCoverUpload(event)">✕ Remove</div>
+      `;
+    }
+    if(status) status.innerHTML = `<span style="color:var(--green);">✓ Cover image ready!</span>`;
+    notify('🖼️','Cover image uploaded!','good');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearCoverUpload(e) {
+  e.stopPropagation();
+  _tempCoverImg = null;
+  const zone = document.getElementById('cover-upload-zone');
+  const status = document.getElementById('cover-upload-status');
+  if(zone){
+    zone.classList.remove('has-img');
+    zone.innerHTML = `<input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="handleCoverUpload(event)"><div class="uz-icon">🖼️</div><div class="uz-text">Click to upload a cover image</div>`;
+    zone.onclick = ()=>document.getElementById('cover-file-input').click();
+  }
+  if(status) status.innerHTML = '';
+}
+
+function getTracklist() {
+  const tracks = parseInt(document.getElementById('music-tracks')?.value||'1');
+  if(tracks <= 1) return null;
+  const adjectives = ['Dark','Golden','Neon','Raw','Pure','Deep','High','Cold','Wild','Lost','Broken','Sacred','Final','Bright','Hollow'];
+  const nouns = ['Dreams','Fire','Vibes','Soul','Light','Night','Ghost','Wave','Storm','Crown','Prayer','Heaven','Earth','Sky','Echo'];
+  const list = [];
+  for(let i=1;i<=tracks;i++){
+    const input = document.getElementById(`track-${i}`);
+    const val = input?.value.trim();
+    list.push(val || `${adjectives[rand(0,adjectives.length-1)]} ${nouns[rand(0,nouns.length-1)]}`);
+  }
+  return list;
+}
+
+function startRecording() {
+  const title = document.getElementById('music-title')?.value.trim();
+  if(!title){ notify('⚠️','Give your music a title!','warn'); return; }
+  if(GS.inProgress){ notify('⚠️','Already recording! Finish current project first.','warn'); return; }
+  const energyCost = selectedMusicType==='album' ? 40 : 20;
+  if(GS.energy < energyCost){ notify('😴','Not enough energy! Rest first.','bad'); return; }
+  const tracklist = getTracklist();
+  _doRecord(title, selectedMusicType, tracklist);
+}
+
+function startRecording_quick(type) {
+  if(GS.inProgress){ notify('⚠️','Already recording!','warn'); return; }
+  const energyCost = type==='album' ? 40 : 20;
+  if(GS.energy < energyCost){ notify('😴','Not enough energy!','bad'); return; }
+  const adjectives = ['Dark','Golden','Neon','Raw','Pure','Deep','High','Cold','Wild','Lost'];
+  const nouns = ['Dreams','Fire','Vibes','Soul','Light','Night','Ghost','Wave','Storm','Crown'];
+  const title = `${adjectives[rand(0,9)]} ${nouns[rand(0,9)]}`;
+  _doRecord(title, type, null);
+}
+
+function _doRecord(title, type, tracklist) {
+  const genreEl = document.getElementById('music-genre');
+  const styleEl = document.getElementById('music-style');
+  const colorEl = document.querySelector('.color-opt.sel');
+  const tracksEl = document.getElementById('music-tracks');
+
+  const genre = genreEl ? genreEl.value : GENRES[rand(0,GENRES.length-1)];
+  const style = styleEl ? styleEl.value : 'gradient';
+  const color = colorEl ? colorEl.dataset.color : COVER_COLORS[rand(0,9)];
+  const tracks = tracksEl ? parseInt(tracksEl.value)||1 : (type==='album'?10:1);
+  const energyCost = type==='album' ? 40 : 20;
+  const weeks = Math.max(1, Math.ceil(tracks * 0.7) + (type==='album'?2:0));
+
+  GS.energy -= energyCost;
+  GS.inProgress = {
+    title, type, genre, style, color, tracks,
+    tracklist: tracklist || null,
+    coverImg: _tempCoverImg || null,  // store uploaded image
+    totalWeeks: weeks, weeksLeft: weeks, week: GS.week,
+  };
+
+  // Reset the image temp after capture
+  _tempCoverImg = null;
+  const zone = document.getElementById('cover-upload-zone');
+  if(zone){ zone.classList.remove('has-img'); zone.innerHTML = `<input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="handleCoverUpload(event)"><div class="uz-icon">🖼️</div><div class="uz-text">Click to upload a cover image</div>`; zone.onclick=()=>document.getElementById('cover-file-input').click(); }
+  const status = document.getElementById('cover-upload-status');
+  if(status) status.innerHTML = '';
+
+  addNews('🎙️', `${GS.artistName} enters the studio to record "${title}" (${genre}).`);
+  notify('🎙️',`Recording started: <strong>${title}</strong>. ${weeks} week(s) to go!`,'info');
+  renderAll();
+}
+
+function completeRecording() {
+  const ip = GS.inProgress;
+  if(!ip) return;
+
+  // Quality calculation
+  const studioBonus = STUDIO_LEVELS[GS.studioLevel-1].qualBonus;
+  const producerBonus = GS.producers.reduce((acc,pid)=>{
+    const p = PRODUCERS.find(x=>x.id===pid); return acc+(p?p.bonus:0);
+  },0);
+  const engineerBonus = GS.staff.includes('engineer') ? 8 : 0;
+  const baseQuality = (GS.creativity * 0.5) + studioBonus + producerBonus + engineerBonus;
+  const quality = Math.min(100, Math.max(1, Math.round(baseQuality + rand(-15,15))));
+
+  // Chart position (1=best)
+  let chartPos;
+  if(quality>=88) chartPos = rand(1,5);
+  else if(quality>=75) chartPos = rand(1,15);
+  else if(quality>=60) chartPos = rand(5,35);
+  else if(quality>=45) chartPos = rand(20,60);
+  else chartPos = rand(50,100);
+
+  // Fan gain
+  const repMult = 1 + (GS.reputation / 100);
+  const fansGained = Math.round(quality * repMult * rand(10,40) * (ip.type==='album'?3:1));
+
+  // Money (streaming advance)
+  const streamAdvance = Math.round(quality * fansGained * 0.05);
+
+  const release = {
+    ...ip,
+    quality, chartPos, fansGained,
+    week: GS.week,
+    revenue: streamAdvance,
+    tracklist: ip.tracklist || null,
+    coverImg: ip.coverImg || null,
+  };
+
+  GS.fans += fansGained;
+  GS.money += streamAdvance;
+  GS.totalEarnings += streamAdvance;
+  GS.streamingRevenue += streamAdvance;
+  GS.reputation = Math.min(100, GS.reputation + Math.round(quality/20));
+
+  // Store peak
+  if(!GS.chartPeaks[ip.title] || GS.chartPeaks[ip.title] > chartPos) {
+    GS.chartPeaks[ip.title] = chartPos;
+  }
+
+  if(ip.type==='album') GS.albums.push(release);
+  else GS.singles.push(release);
+
+  // Update charts
+  updateCharts(release);
+
+  GS.inProgress = null;
+
+  // Review text
+  const reviews = quality>=85
+    ? ['A certified classic.','Genre-defining work.','Could be the album of the year.']
+    : quality>=65
+    ? ['A solid effort.','Has some bops, definitely worth a listen.','Shows growth as an artist.']
+    : ['Below expectations.','Feels rushed.','Not their best work.'];
+  const review = reviews[rand(0,reviews.length-1)];
+
+  addNews('📻', `"${ip.title}" by ${GS.artistName} drops at #${chartPos} on the charts. Critics say: "${review}"`);
+  notify('🎉',`<strong>${ip.title}</strong> released! Chart #${chartPos} • +${formatNum(fansGained)} fans • ${formatMoney(streamAdvance)}`,chartPos<=10?'epic':'good');
+
+  // Hype bonus
+  if(chartPos<=5){
+    notify('🔥','TOP 5 DEBUT! Your reputation is sky high!','epic');
+    GS.reputation = Math.min(100, GS.reputation+10);
+    GS.confidence = Math.min(100, GS.confidence+15);
+    awardCheck('number_one');
+    giveAward('🥇','Chart Dominator',`"${ip.title}" hit #${chartPos}`);
+  }
+
+  checkAchievements();
+  renderAll();
+}
+
+function updateCharts(release) {
+  const entry = {
+    rank: release.chartPos,
+    title: release.title,
+    artist: GS.artistName,
+    pts: Math.max(10, 110 - release.chartPos),
+    isPlayer: true,
+  };
+  // Remove old player entries that fell off
+  GS.charts = GS.charts.filter(c=>!(c.isPlayer && c.title!==release.title));
+  GS.charts.push(entry);
+  // Rival fluctuation
+  GS.charts.forEach(c=>{
+    if(!c.isPlayer) c.pts = Math.max(1, c.pts + rand(-8,3));
+  });
+  GS.charts.sort((a,b)=>b.pts-a.pts);
+  GS.charts.forEach((c,i)=>c.rank=i+1);
+  GS.charts = GS.charts.slice(0,12);
+}
+
+// ============================================================
+// WEEK ADVANCEMENT
+// ============================================================
+function advanceWeek() {
+  GS.week++;
+  GS.weeksPlayed++;
+  if(GS.week > 52){ GS.week = 1; GS.year++; }
+
+  // Recording progress
+  if(GS.inProgress){
+    GS.inProgress.weeksLeft--;
+    if(GS.inProgress.weeksLeft <= 0) completeRecording();
+  }
+
+  // Energy regeneration
+  GS.energy = Math.min(100, GS.energy + rand(8,15));
+
+  // Mental pressure effects
+  if(GS.mentalPressure > 80){
+    GS.creativity = Math.max(0, GS.creativity - rand(1,3));
+    GS.confidence = Math.max(0, GS.confidence - rand(1,3));
+    if(Math.random() < 0.15){
+      addNews('😔','Mental pressure takes a toll on the artist.');
+      notify('😔','High mental pressure is affecting your creativity!','bad');
+    }
+  }
+  GS.mentalPressure = Math.max(0, GS.mentalPressure - 2);
+
+  // Passive fan gain/loss from streaming
+  if(GS.singles.length > 0 || GS.albums.length > 0){
+    const passiveGain = Math.round((GS.fans * 0.002) + (GS.reputation * 0.5));
+    GS.fans += passiveGain;
+    const streamRev = Math.round(GS.fans * 0.0001 * GS.reputation);
+    GS.money += streamRev;
+    GS.totalEarnings += streamRev;
+    GS.streamingRevenue += streamRev;
+  }
+
+  // Fashion drops progress & revenue
+  GS.fashionDrops.forEach(d=>{
+    if(!d.done){
+      d.weeksLeft--;
+      if(d.weeksLeft<=0){
+        d.done = true;
+        d.weeksActive = 0;
+        notify('👗',`Fashion drop <strong>${d.name}</strong> is now live!`,'good');
+      }
+    } else {
+      d.weeksActive++;
+      const rev = Math.round(d.weeklyRevenue * (1 + GS.fashionInfluence/200));
+      GS.money += rev;
+      GS.totalEarnings += rev;
+      GS.fashionRevenue += rev;
+    }
+  });
+
+  // Touring
+  if(GS.currentTour){
+    const nextShow = GS.currentTour.cities.find(c=>!c.done);
+    if(!nextShow){
+      completeTour();
+    }
+  }
+
+  // Random chart fluctuation
+  GS.charts.forEach(c=>{
+    if(!c.isPlayer) c.pts = Math.max(1, c.pts + rand(-5,2));
+  });
+  GS.charts.sort((a,b)=>b.pts-a.pts);
+  GS.charts.forEach((c,i)=>c.rank=i+1);
+  GS.charts = GS.charts.slice(0,12);
+
+  // Rival fluctuation
+  GS.rivals.forEach(r=>{
+    r.fans = Math.max(0, r.fans + rand(-500,2000));
+    r.hot = Math.random() > 0.4;
+    if(Math.random() < 0.08){
+      const title = `"${['Drip','Glow','No Cap','Wave','Flex'][rand(0,4)]} ${GS.week}"`;
+      addNews(`${r.icon}`, `${r.name} drops new music ${title}. ${r.hot?'Fans go crazy!':'Mixed reviews.'}`);
+    }
+  });
+
+  // Random events
+  if(Math.random() < 0.25) triggerRandomEvent();
+  if(Math.random() < 0.08) triggerScandal();
+  if(Math.random() < 0.05 && GS.brand) generateCollabOffer();
+  if(Math.random() < 0.04 && GS.reputation > 40) offerAwardNomination();
+
+  // Staff effects
+  if(GS.staff.includes('pr')){
+    GS.fans += 200;
+  }
+  if(GS.staff.includes('manager')){
+    GS.reputation = Math.min(100, GS.reputation + 0.5);
+  }
+  if(GS.staff.includes('social')){
+    GS.fans += 500;
+  }
+
+  // Check ending conditions
+  if(!GS.endingTriggered && GS.fans >= 50000000){
+    triggerEnding('ICON','You became the most iconic artist of your generation. The whole world knows your name.');
+  }
+
+  checkAchievements();
+  autoSave();
+  renderAll();
+
+  // Week notification (every 4 weeks)
+  if(GS.week % 4 === 0){
+    notify('📅',`Month passed — Week ${GS.week}, ${GS.year}. Keep grinding!`,'info');
+  }
+}
+
+// ============================================================
+// RANDOM EVENTS
+// ============================================================
+function triggerRandomEvent() {
+  if(Math.random() < 0.6){
+    const ev = POSITIVE_EVENTS[rand(0,POSITIVE_EVENTS.length-1)];
+    const fanGain = ev.fans ? ev.fans() : 0;
+    const moneyGain = ev.money ? ev.money() : 0;
+    if(fanGain > 0){ GS.fans += fanGain; }
+    if(moneyGain > 0){ GS.money += moneyGain; GS.totalEarnings += moneyGain; }
+    if(ev.rep){ GS.reputation = Math.min(100, GS.reputation + ev.rep); }
+    if(ev.fashion){ GS.fashionInfluence = Math.min(100, GS.fashionInfluence + ev.fashion); }
+    addNews('✨', ev.msg + (fanGain?` +${formatNum(fanGain)} fans.`:'') + (moneyGain?` +${formatMoney(moneyGain)}.`:''));
+    notify('✨', ev.msg, 'good');
+  } else {
+    const ev = NEGATIVE_EVENTS[rand(0,NEGATIVE_EVENTS.length-1)];
+    const moneyLoss = ev.money ? -ev.money() : 0;
+    if(moneyLoss > 0){ GS.money = Math.max(0, GS.money - moneyLoss); }
+    if(ev.rep){ GS.reputation = Math.max(0, GS.reputation + ev.rep); }
+    if(ev.ego){ GS.ego = Math.min(100, GS.ego + ev.ego); }
+    if(ev.pressure){ GS.mentalPressure = Math.min(100, GS.mentalPressure + ev.pressure); }
+    const fanLoss = ev.fans ? -ev.fans() : 0;
+    if(fanLoss > 0) GS.fans = Math.max(0, GS.fans - fanLoss);
+    addNews('⚠️', ev.msg);
+    notify('⚠️', ev.msg, 'bad');
+  }
+}
+
+function triggerScandal() {
+  const scandal = SCANDAL_POOL[rand(0,SCANDAL_POOL.length-1)];
+  GS.scandals++;
+  const repLoss = rand(3,12);
+  const fansGain = rand(-2000, 5000); // controversy can gain fans
+  GS.reputation = Math.max(0, GS.reputation - repLoss);
+  GS.fans = Math.max(0, GS.fans + fansGain);
+  GS.ego = Math.min(100, GS.ego + rand(2,8));
+  GS.mentalPressure = Math.min(100, GS.mentalPressure + rand(5,15));
+
+  // Check comeback achievement
+  if(GS.reputation < 10) GS.flags.lowRep = true;
+  if(GS.flags.lowRep && GS.reputation > 60) GS.flags.comeback = true;
+
+  addNews('🔥', `SCANDAL: ${GS.artistName} ${scandal}. Rep -${repLoss}.`);
+  notify('🔥',`Scandal! ${GS.artistName} ${scandal}.`,'bad');
+
+  if(GS.staff.includes('lawyer') && Math.random() < 0.7){
+    notify('⚖️','Your lawyer helped contain the damage!','info');
+    GS.reputation = Math.min(100, GS.reputation + Math.round(repLoss/2));
+  }
+
+  checkAchievements();
+}
+
+function triggerEnding(title, sub) {
+  GS.endingTriggered = true;
+  setTimeout(()=>{
+    const e = document.getElementById('ending');
+    e.style.display = 'flex';
+    document.getElementById('ending-title').textContent = title;
+    document.getElementById('ending-sub').textContent = sub;
+    document.getElementById('ending-stats').innerHTML = `
+      ${GS.artistName}<br>
+      ${formatNum(GS.fans)} Fans<br>
+      ${formatMoney(GS.totalEarnings)} Earned<br>
+      ${GS.albums.length} Albums • ${GS.singles.length} Singles<br>
+      ${GS.tourHistory.length} Tours • ${GS.scandals} Scandals
+    `;
+  }, 1000);
+}
+
+// ============================================================
+// QUICK ACTIONS
+// ============================================================
+function doRest() {
+  const gain = rand(25,40);
+  GS.energy = Math.min(100, GS.energy + gain);
+  GS.mentalPressure = Math.max(0, GS.mentalPressure - rand(5,15));
+  notify('😴',`Rested up! +${gain} energy.`,'good');
+  renderAll();
+}
+
+function quickPost() {
+  // Quick post from dashboard — redirect to social tab
+  showTab('social');
+  notify('📱','Write your post in the Social tab!','info');
+}
+
+function updateCharCount() {
+  const el = document.getElementById('social-post-text');
+  const counter = document.getElementById('char-counter');
+  if(!el||!counter) return;
+  const remaining = 280 - el.value.length;
+  counter.textContent = remaining;
+  counter.className = 'char-counter' + (remaining < 20 ? ' over' : remaining < 60 ? ' warn' : '');
+}
+
+function makePost(type) {
+  // Check cooldown (2 weeks between posts)
+  if(!GS.cooldowns) GS.cooldowns = { post:0, interview:0, invest:0 };
+  const COOLDOWN_WEEKS = 2;
+  if(GS.week < GS.cooldowns.post){
+    const weeksLeft = GS.cooldowns.post - GS.week;
+    notify('⏳',`Post cooldown: <strong>${weeksLeft} week(s)</strong> remaining.`,'warn');
+    return;
+  }
+
+  const textEl = document.getElementById('social-post-text');
+  let text = textEl?.value.trim();
+
+  // Require actual custom text
+  if(!text || text.length < 3){
+    notify('✏️','Write something first! (at least 3 characters)','warn');
+    textEl?.focus();
+    return;
+  }
+  if(text.length > 280){ notify('✏️','Keep it under 280 characters!','warn'); return; }
+
+  let fanGain = rand(50, 300), repChange = 0;
+  let postNote = '';
+  if(type==='controversial'){
+    fanGain = rand(500, 3000);
+    repChange = -rand(2, 8);
+    GS.ego = Math.min(100, GS.ego + rand(2,5));
+    GS.scandals++;
+    postNote = '🔥 Controversial post';
+  } else if(type==='humble'){
+    fanGain = rand(100, 600);
+    repChange = rand(2, 5);
+    GS.confidence = Math.min(100, GS.confidence + 3);
+    postNote = '🙏 Humble post';
+  } else {
+    postNote = '🐦 Normal post';
+  }
+
+  // Social manager bonus
+  if(GS.staff && GS.staff.includes('social')) fanGain = Math.round(fanGain * 1.5);
+
+  const likes = Math.round(fanGain * rand(2, 6));
+  const retweets = Math.round(likes * (0.1 + Math.random()*0.2));
+  const comments = Math.round(likes * (0.03 + Math.random()*0.07));
+
+  GS.socialPosts.push({ text, week: GS.week, type, likes, retweets, comments });
+  GS.fans += fanGain;
+  GS.reputation = Math.max(0, Math.min(100, GS.reputation + repChange));
+
+  // Apply 2-week cooldown
+  GS.cooldowns.post = GS.week + COOLDOWN_WEEKS;
+
+  if(textEl) textEl.value = '';
+  updateCharCount();
+
+  addNews('📱', `${GS.artistName} posts: "${text.slice(0,60)}${text.length>60?'...':''}"`);
+  notify('📱',`${postNote} sent! +${formatNum(fanGain)} fans. Cooldown: ${COOLDOWN_WEEKS} weeks.`,type==='controversial'?'warn':'good');
+  renderAll();
+}
+
+function doInvest() {
+  if(!GS.cooldowns) GS.cooldowns = { post:0, interview:0, invest:0 };
+  const INVEST_CD = 2;
+  if(GS.money < 500){ notify('💸','Not enough money!','bad'); return; }
+  if(GS.week < GS.cooldowns.invest){
+    notify('⏳',`Investment cooldown: <strong>${GS.cooldowns.invest - GS.week} week(s)</strong> left.`,'warn'); return;
+  }
+  GS.cooldowns.invest = GS.week + INVEST_CD;
+  const amount = Math.min(GS.money * 0.3, rand(500, 10000));
+  const success = Math.random() < 0.55;
+  if(success){
+    const gain = Math.round(amount * (1 + Math.random()));
+    GS.money += gain - amount;
+    GS.totalEarnings += gain - amount;
+    notify('📈',`Investment paid off! +${formatMoney(gain-amount)}`,'good');
+    addNews('💹',`${GS.artistName}'s business venture turns profitable.`);
+  } else {
+    GS.money -= Math.round(amount * 0.4);
+    notify('📉',`Investment flopped! Lost ${formatMoney(Math.round(amount*0.4))}`,'bad');
+  }
+  renderAll();
+}
+
+// ============================================================
+// STUDIO SYSTEM
+// ============================================================
+function upgradeStudio() {
+  const cur = STUDIO_LEVELS[GS.studioLevel-1];
+  if(!cur.upgradeCost){ notify('🌌','Already at max level!','info'); return; }
+  if(GS.money < cur.upgradeCost){ notify('💸',`Need ${formatMoney(cur.upgradeCost)} to upgrade!`,'bad'); return; }
+  GS.money -= cur.upgradeCost;
+  GS.studioLevel++;
+  const next = STUDIO_LEVELS[GS.studioLevel-1];
+  addNews('🏛️',`${GS.artistName} upgrades to a ${next.name}!`);
+  notify('🎛️',`Studio upgraded to <strong>${next.name}</strong>! Quality +${next.qualBonus}`,'epic');
+  checkAchievements();
+  renderAll();
+}
+
+function hireProducer(pid) {
+  if(GS.producers.includes(pid)){ notify('✓','Already hired!','info'); return; }
+  const p = PRODUCERS.find(x=>x.id===pid);
+  if(!p) return;
+  if(GS.money < p.cost){ notify('💸',`Need ${formatMoney(p.cost)}!`,'bad'); return; }
+  GS.money -= p.cost;
+  GS.producers.push(pid);
+  notify('🎹',`Hired <strong>${p.name}</strong>! ${p.desc} on all tracks.`,'good');
+  checkAchievements();
+  renderAll();
+}
+
+function hireStaff(sid) {
+  if(GS.staff.includes(sid)){ notify('✓','Already hired!','info'); return; }
+  const s = STAFF_OPTIONS.find(x=>x.id===sid);
+  if(!s) return;
+  if(GS.money < s.cost){ notify('💸',`Need ${formatMoney(s.cost)}!`,'bad'); return; }
+  GS.money -= s.cost;
+  GS.staff.push(sid);
+  notify('👔',`Hired <strong>${s.name}</strong>!`,'good');
+  renderAll();
+}
+
+// ============================================================
+// TOUR SYSTEM
+// ============================================================
+function startTour() {
+  if(GS.currentTour){ notify('🚌','Already on tour!','warn'); return; }
+  const name = document.getElementById('tour-name')?.value.trim() || `The ${GS.year} World Tour`;
+  const venueKey = document.getElementById('tour-venue')?.value || 'club';
+  const venue = VENUE_DATA[venueKey];
+  const cities = getSelectedCities();
+
+  if(cities.length === 0){ notify('🗺️','Select at least one city!','warn'); return; }
+  if(GS.fans < venue.reqFans){ notify('👥',`Need ${formatNum(venue.reqFans)} fans for this venue!`,'bad'); return; }
+  if(GS.money < venue.cost){ notify('💸',`Tour setup costs ${formatMoney(venue.cost)}!`,'bad'); return; }
+
+  GS.money -= venue.cost;
+
+  GS.currentTour = {
+    name, venue: venueKey,
+    cities: cities.map(c=>({name:c, done:false, earned:0})),
+    totalEarned: 0, fansGained: 0,
+  };
+
+  addNews('🚌',`${GS.artistName} launches "${name}" tour across ${cities.length} cities!`);
+  notify('🚌',`Tour <strong>${name}</strong> is underway! ${cities.length} shows booked.`,'good');
+  renderAll();
+}
+
+function performConcert() {
+  if(!GS.currentTour){ return; }
+  const nextShow = GS.currentTour.cities.find(c=>!c.done);
+  if(!nextShow){ completeTour(); return; }
+  if(GS.energy < 25){ notify('😴','Too tired to perform! Rest first.','bad'); return; }
+
+  const venue = VENUE_DATA[GS.currentTour.venue];
+  const energyMult = GS.energy / 100;
+  const repMult = 1 + (GS.reputation / 200);
+  const attendanceRate = Math.min(1, (GS.fans / venue.cap) * energyMult * repMult * (0.6 + Math.random()*0.4));
+  const attendance = Math.round(venue.cap * attendanceRate);
+  const earned = Math.round(attendance * venue.ticket);
+
+  // Bonus from staff
+  const agentBonus = GS.staff.includes('agent') ? 1.15 : 1;
+  const totalEarned = Math.round(earned * agentBonus);
+
+  nextShow.done = true;
+  nextShow.earned = totalEarned;
+  GS.currentTour.totalEarned += totalEarned;
+
+  const fanGain = Math.round(attendance * 0.05);
+  GS.currentTour.fansGained += fanGain;
+  GS.fans += fanGain;
+  GS.money += totalEarned;
+  GS.totalEarnings += totalEarned;
+  GS.tourRevenue += totalEarned;
+  GS.energy -= rand(20,30);
+  GS.confidence = Math.min(100, GS.confidence + rand(2,5));
+  GS.mentalPressure = Math.min(100, GS.mentalPressure + rand(3,8));
+
+  // Sold out check
+  if(attendanceRate >= 0.98 && GS.currentTour.venue === 'stadium'){
+    GS.flags.soldOutStadium = true;
+    checkAchievements();
+    notify('🏟️','STADIUM SOLD OUT! Legendary performance!','epic');
+    giveAward('🏟️','Stadium Sellout',`Sold out ${nextShow.name}`);
+  }
+
+  // Random concert event
+  if(Math.random() < 0.2){
+    const events = ['The crowd went absolutely wild!','Stage production was flawless.','Surprise guest appearance!','Power outage delayed the show — but you recovered!'];
+    const ev = events[rand(0,events.length-1)];
+    addNews('🎤',`${nextShow.name} show: "${ev}" Revenue: ${formatMoney(totalEarned)}`);
+  }
+
+  notify('🎤',`${nextShow.name} show complete! +${formatMoney(totalEarned)} • +${formatNum(fanGain)} fans`,'good');
+
+  const remaining = GS.currentTour.cities.filter(c=>!c.done).length;
+  if(remaining === 0) completeTour();
+  renderAll();
+}
+
+function completeTour() {
+  if(!GS.currentTour) return;
+  const t = GS.currentTour;
+  GS.tourHistory.push({ ...t });
+  addNews('🏁',`"${t.name}" tour wraps up! Total: ${formatMoney(t.totalEarned)}, ${formatNum(t.fansGained)} new fans.`);
+  notify('🏁',`Tour <strong>${t.name}</strong> complete! ${formatMoney(t.totalEarned)} earned!`,'epic');
+  GS.currentTour = null;
+  checkAchievements();
+  renderAll();
+}
+
+// ============================================================
+// FASHION SYSTEM
+// ============================================================
+function launchBrand() {
+  const name = document.getElementById('brand-name')?.value.trim();
+  const vibe = document.getElementById('brand-vibe')?.value || 'Streetwear';
+  if(!name){ notify('⚠️','Name your brand!','warn'); return; }
+  const icons = ['👑','💎','🔱','⚡','🌊','🦅','🐉','🌌'];
+  GS.brand = { name, vibe, icon: icons[rand(0,icons.length-1)] };
+  GS.fashionInfluence = 10;
+  addNews('👗',`${GS.artistName} launches fashion brand "${name}" — ${vibe} vibes!`);
+  notify('👗',`Brand <strong>${name}</strong> is LIVE!`,'epic');
+  checkAchievements();
+  renderAll();
+}
+
+function launchDrop(productId) {
+  if(!GS.brand){ notify('⚠️','Launch a brand first!','warn'); return; }
+  if(GS.fashionDrops.find(d=>d.id===productId&&!d.done)){
+    notify('⚠️','Already in production!','warn'); return;
+  }
+  const product = FASHION_PRODUCTS.find(p=>p.id===productId);
+  if(!product) return;
+  if(GS.money < product.cost){ notify('💸',`Need ${formatMoney(product.cost)}!`,'bad'); return; }
+
+  GS.money -= product.cost;
+  const weeklyRevenue = Math.round(product.revenue * (1 + GS.fashionInfluence/100));
+  GS.fashionDrops.push({
+    ...product, done:false, weeksLeft:product.weeks,
+    weeklyRevenue, weeksActive:0,
+  });
+  GS.fashionInfluence = Math.min(100, GS.fashionInfluence + rand(3,8));
+  notify('📦',`<strong>${product.name}</strong> drop in production! ${product.weeks} week(s).`,'good');
+  renderAll();
+}
+
+function generateCollabOffer() {
+  const brands = [
+    {brand:'NikeLab',     icon:'👟', desc:'Limited sneaker collab — huge revenue boost'},
+    {brand:'Supreme',     icon:'🔴', desc:'Box logo tee collab — streetwear royalty'},
+    {brand:'Balenciaga',  icon:'💎', desc:'High fashion collab — fashion influence x2'},
+    {brand:'Adidas',      icon:'⚡', desc:'Full apparel line collab'},
+    {brand:'LV Archive',  icon:'🟤', desc:'Luxury collab — exclusive drop'},
+  ];
+  if(GS.fashionInfluence < 20) return;
+  const offer = brands[rand(0,brands.length-1)];
+  if(GS.collabOffers.find(c=>c.brand===offer.brand)) return;
+  GS.collabOffers.push({ ...offer, week:GS.week });
+  notify('🤝',`Collab offer from <strong>${offer.brand}</strong>! Check Fashion tab.`,'epic');
+}
+
+function acceptCollab(idx) {
+  const offer = GS.collabOffers[idx];
+  if(!offer) return;
+  const moneyGain = rand(20000, 100000);
+  const fashionGain = rand(10,25);
+  GS.money += moneyGain;
+  GS.totalEarnings += moneyGain;
+  GS.fashionRevenue += moneyGain;
+  GS.fashionInfluence = Math.min(100, GS.fashionInfluence + fashionGain);
+  GS.collabOffers.splice(idx, 1);
+  addNews('🤝',`${GS.artistName} × ${offer.brand} collab drops to massive fanfare! +${formatMoney(moneyGain)}`);
+  notify('🤝',`${offer.brand} collab complete! +${formatMoney(moneyGain)}`,'epic');
+  giveAward('🤝','Collab Royalty',`${GS.artistName} × ${offer.brand}`);
+  checkAchievements();
+  renderAll();
+}
+
+function declineCollab(idx) {
+  GS.collabOffers.splice(idx, 1);
+  notify('✋','Offer declined.','info');
+  renderAll();
+}
+
+// ============================================================
+// INTERVIEW SYSTEM
+// ============================================================
+let currentInterview = null;
+function generateInterview() {
+  currentInterview = INTERVIEW_QUESTIONS[rand(0,INTERVIEW_QUESTIONS.length-1)];
+}
+
+function renderInterview(onCooldown) {
+  const panel = document.getElementById('interview-panel');
+  if(!panel) return;
+  if(onCooldown){
+    panel.innerHTML='<div style="color:var(--text2);font-size:13px;">Recharge before your next interview.</div>';
+    return;
+  }
+  if(!currentInterview){
+    panel.innerHTML='<div style="color:var(--text2);font-size:13px;">No interviews scheduled.</div>';
+    return;
+  }
+  panel.innerHTML = `
+    <div class="int-q">${currentInterview.q}</div>
+    ${currentInterview.opts.map((o,i)=>`
+      <div class="int-choice" onclick="answerInterview(${i})">${o.text}</div>
+    `).join('')}
+  `;
+}
+
+function doInterview() {
+  if(GS.energy < 15){ notify('😴','Too tired for interview!','bad'); return; }
+  if(!GS.cooldowns) GS.cooldowns = { post:0, interview:0, invest:0 };
+  if(GS.week < GS.cooldowns.interview){
+    notify('⏳',`Interview cooldown: <strong>${GS.cooldowns.interview - GS.week} week(s)</strong> left.`,'warn');
+    return;
+  }
+  showTab('social');
+  notify('🎤','Interview is ready — answer it in the Social tab!','info');
+}
+
+function answerInterview(optIdx) {
+  if(!currentInterview) return;
+  if(!GS.cooldowns) GS.cooldowns = { post:0, interview:0, invest:0 };
+  const INTERVIEW_CD = 3;
+  if(GS.week < GS.cooldowns.interview){
+    notify('⏳',`Interview cooldown: ${GS.cooldowns.interview - GS.week} week(s) left.`,'warn'); return;
+  }
+  const opt = currentInterview.opts[optIdx];
+  GS.energy -= 15;
+  GS.interviews++;
+  GS.cooldowns.interview = GS.week + INTERVIEW_CD;
+
+  if(opt.rep) GS.reputation = Math.max(0, Math.min(100, GS.reputation + opt.rep));
+  if(opt.fans) GS.fans += opt.fans;
+  if(opt.ego) GS.ego = Math.min(100, GS.ego + opt.ego);
+  if(opt.creativity) GS.creativity = Math.min(100, GS.creativity + opt.creativity);
+  if(opt.scandal){ GS.scandals++; GS.mentalPressure = Math.min(100, GS.mentalPressure + 10); }
+  if(opt.money) GS.money += opt.money;
+  if(opt.fashion) GS.fashionInfluence = Math.min(100, GS.fashionInfluence + opt.fashion);
+
+  const outcomes = [];
+  if(opt.rep > 0) outcomes.push(`Rep +${opt.rep}`);
+  if(opt.rep < 0) outcomes.push(`Rep ${opt.rep}`);
+  if(opt.fans) outcomes.push(`+${formatNum(opt.fans)} fans`);
+
+  addNews('📺',`${GS.artistName} interview: "${opt.text}". ${outcomes.join(', ')}.`);
+  notify('📺',`Interview done! ${outcomes.join(' • ')} — Next in ${INTERVIEW_CD} weeks.`,'info');
+
+  generateInterview();
+  checkAchievements();
+  renderAll();
+}
+
+// ============================================================
+// RIVALS SYSTEM
+// ============================================================
+function beefRival(name) {
+  const rival = GS.rivals.find(r=>r.name===name);
+  if(!rival) return;
+  const win = GS.reputation > rival.fans/10000;
+  if(win){
+    const fanGain = rand(1000,10000);
+    GS.fans += fanGain;
+    GS.reputation = Math.min(100, GS.reputation + rand(2,6));
+    rival.fans = Math.max(0, rival.fans - rand(500,5000));
+    addNews('🥊',`${GS.artistName} wins the beef with ${name}! +${formatNum(fanGain)} fans.`);
+    notify('🥊',`Beef with <strong>${name}</strong> won! +${formatNum(fanGain)} fans.`,'good');
+  } else {
+    const fanLoss = rand(200,2000);
+    GS.fans = Math.max(0, GS.fans - fanLoss);
+    GS.reputation = Math.max(0, GS.reputation - rand(3,8));
+    GS.scandals++;
+    addNews('💔',`${GS.artistName} gets bodied by ${name} in the beef. Fan loss.`);
+    notify('💔',`Beef with <strong>${name}</strong> backfired! -${formatNum(fanLoss)} fans.`,'bad');
+  }
+  renderAll();
+}
+
+// ============================================================
+// AWARDS SYSTEM
+// ============================================================
+function offerAwardNomination() {
+  const awards = [
+    {icon:'🎵',name:'Best Rap Album',desc:'Music Academy Award'},
+    {icon:'🎤',name:'Artist of the Year',desc:'Global Music Awards'},
+    {icon:'🔥',name:'Hottest In The Game',desc:'Street Cred Awards'},
+    {icon:'🌍',name:'International Artist',desc:'World Music Summit'},
+    {icon:'💿',name:'Platinum Certification',desc:`${GS.singles[0]?.title||'Track'} goes platinum`},
+  ];
+  const award = awards[rand(0,awards.length-1)];
+  if(GS.awards.find(a=>a.name===award.name)) return;
+  const wins = Math.random() < (0.3 + GS.reputation/200);
+  if(wins){
+    giveAward(award.icon, award.name, award.desc);
+    addNews('🏆',`${GS.artistName} wins ${award.name} at ${award.desc}!`);
+    notify('🏆',`WON: <strong>${award.name}</strong>!`,'epic');
+    GS.reputation = Math.min(100, GS.reputation + rand(5,10));
+    GS.confidence = Math.min(100, GS.confidence + rand(5,15));
+    GS.ego = Math.min(100, GS.ego + rand(5,10));
+  }
+}
+
+function giveAward(icon, name, desc) {
+  if(GS.awards.find(a=>a.name===name)) return;
+  GS.awards.push({icon,name,desc});
+  renderAll();
+}
+
+function awardCheck(type) {
+  if(type==='number_one' && !GS.awards.find(a=>a.name==='#1 Charted')){
+    giveAward('🥇','#1 Charted','Hit the top of the charts');
+  }
+}
+
+// ============================================================
+// ACHIEVEMENTS SYSTEM
+// ============================================================
+function checkAchievements() {
+  ACHIEVEMENTS_DEF.forEach(a=>{
+    if(!GS.achievements.includes(a.id) && a.check(GS)){
+      GS.achievements.push(a.id);
+      notify(`${a.icon}`,`Achievement unlocked: <strong>${a.name}</strong>!`,'epic');
+      giveAward(a.icon, `Achievement: ${a.name}`, a.desc);
+    }
+  });
+}
+
+// ============================================================
+// SAVE / LOAD SYSTEM
+// ============================================================
+function saveGame(slot) {
+  try {
+    localStorage.setItem(`pablo_${slot}`, JSON.stringify(GS));
+    notify('💾',`Game saved to <strong>${slot.toUpperCase()}</strong>!`,'good');
+    renderSaveTab();
+  } catch(e) {
+    notify('⚠️','Save failed!','bad');
+  }
+}
+
+function autoSave() {
+  try { localStorage.setItem('pablo_auto', JSON.stringify(GS)); } catch(e){}
+}
+
+function loadGame(slot) {
+  try {
+    const data = localStorage.getItem(`pablo_${slot}`);
+    if(!data){ notify('⚠️','No save found!','warn'); return; }
+    GS = JSON.parse(data);
+    notify('📂',`Game loaded from <strong>${slot.toUpperCase()}</strong>!`,'good');
+    document.getElementById('sb-name').textContent = GS.artistName;
+    renderAll();
+  } catch(e) {
+    notify('⚠️','Load failed — corrupted save.','bad');
+  }
+}
+
+function resetGame() {
+  document.getElementById('ending').style.display = 'none';
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('splash').style.display = 'flex';
+  document.getElementById('name-input').value = '';
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`tab-${id}`)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')?.includes(`'${id}'`)) n.classList.add('active');
+  });
+  // Re-render active tab
+  switch(id){
+    case 'dashboard': renderDashboard(); break;
+    case 'music': renderMusicTab(); break;
+    case 'studio': renderStudioTab(); break;
+    case 'tour': renderTourTab(); break;
+    case 'fashion': renderFashionTab(); break;
+    case 'social': renderSocialTab(); break;
+    case 'world': renderWorldTab(); break;
+    case 'awards': renderAwardsTab(); break;
+    case 'save': renderSaveTab(); break;
+  }
+  updateTourPreview();
+}
+
+// ============================================================
+// NOTIFICATION SYSTEM
+// ============================================================
+function notify(icon, text, type='info') {
+  const c = document.getElementById('notif-container');
+  const n = document.createElement('div');
+  n.className = `notif ${type}`;
+  n.innerHTML = `<div class="ni">${icon}</div><div class="nt">${text}</div>`;
+  c.appendChild(n);
+  setTimeout(()=>{
+    n.style.animation='notifOut 0.4s ease forwards';
+    setTimeout(()=>n.remove(), 400);
+  }, 4000);
+  // Max 5 notifications
+  while(c.children.length > 5) c.removeChild(c.firstChild);
+}
+
+// ============================================================
+// NEWS SYSTEM
+// ============================================================
+function addNews(icon, text) {
+  GS.newsItems.push({ icon, text, week: GS.week });
+  if(GS.newsItems.length > 50) GS.newsItems.shift();
+}
+
+// ============================================================
+// COVER ART GENERATOR
+// ============================================================
+function getCoverStyle(music) {
+  // If a custom image was uploaded, use it
+  if(music.coverImg) return `background:url('${music.coverImg}') center/cover no-repeat;`;
+  const c = music.color || '#FFD700';
+  const c2 = music.color2 || '#8B5CF6';
+  switch(music.style){
+    case 'geometric':
+      return `background:${c};background-image:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(0,0,0,0.3) 10px,rgba(0,0,0,0.3) 11px);`;
+    case 'gradient':
+      return `background:linear-gradient(135deg,${c},${c2});`;
+    case 'dark':
+      return `background:#111;border:2px solid ${c};`;
+    case 'neon':
+      return `background:#000;box-shadow:inset 0 0 20px ${c};border:1px solid ${c};`;
+    case 'abstract':
+      return `background:radial-gradient(circle at 30% 70%,${c} 0%,transparent 50%),radial-gradient(circle at 70% 30%,${c2} 0%,transparent 50%),#111;`;
+    case 'glitch':
+      return `background:linear-gradient(90deg,${c} 33%,#000 33%,#000 66%,${c2} 66%);`;
+    default:
+      return `background:linear-gradient(135deg,${c},${c2});`;
+  }
+}
+
+function toggleTracklist(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.toggle('open');
+  // Update button label
+  const btn = el.previousElementSibling?.querySelector('.disco-expand-btn');
+  if(btn) btn.textContent = el.classList.contains('open') ? '▲ Tracks' : '▼ Tracks';
+}
+
+// ============================================================
+// CAREER LEVEL
+// ============================================================
+function getCareerLevel() {
+  let level = CAREER_LEVELS[0];
+  for(const l of CAREER_LEVELS){
+    if(GS.fans >= l.fans) level = l;
+    else break;
+  }
+  return level;
+}
+
+// ============================================================
+// SPLASH PARTICLES
+// ============================================================
+(function initSplashParticles(){
+  const c = document.getElementById('splash-particles');
+  for(let i=0;i<40;i++){
+    const p = document.createElement('div');
+    p.className='sp';
+    const size = Math.random()*4+1;
+    const colors = ['#FFD700','#8B5CF6','#00f5ff','#ff2d78','#FFA500'];
+    p.style.cssText=`
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${Math.random()*10+6}s;
+      animation-delay:-${Math.random()*10}s;
+      --drift:${(Math.random()-0.5)*100}px;
+    `;
+    c.appendChild(p);
+  }
+})();
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function rand(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+function formatNum(n){
+  if(n===undefined||n===null) return '0';
+  n = Math.floor(n);
+  if(n>=1000000000) return (n/1000000000).toFixed(1)+'B';
+  if(n>=1000000) return (n/1000000).toFixed(1)+'M';
+  if(n>=1000) return (n/1000).toFixed(1)+'K';
+  return n.toString();
+}
+
+function formatMoney(n){
+  if(n===undefined||n===null) return '$0';
+  n = Math.floor(n);
+  const neg = n<0;
+  const abs = Math.abs(n);
+  let fmt;
+  if(abs>=1000000000) fmt='$'+(abs/1000000000).toFixed(1)+'B';
+  else if(abs>=1000000) fmt='$'+(abs/1000000).toFixed(1)+'M';
+  else if(abs>=1000) fmt='$'+(abs/1000).toFixed(1)+'K';
+  else fmt='$'+abs;
+  return neg?'-'+fmt:fmt;
+}
+
+// Keyboard shortcut: press W to advance week
+document.addEventListener('keydown', e => {
+  if(e.key==='w'||e.key==='W'){
+    if(document.getElementById('game').style.display==='flex') advanceWeek();
+  }
+});
+
+// Tour venue change listener
+document.addEventListener('change', e=>{
+  if(e.target.id==='tour-venue') updateTourPreview();
+});
+
+// Auto-load from autosave on page load
+window.addEventListener('load', ()=>{
+  const auto = localStorage.getItem('pablo_auto');
+  if(auto){
+    try{
+      const d = JSON.parse(auto);
+      if(d&&d.artistName&&d.week>1){
+        // Show option to continue
+        const cont = document.createElement('div');
+        cont.style.cssText='position:absolute;bottom:20px;left:50%;transform:translateX(-50%);text-align:center;z-index:10;';
+        cont.innerHTML=`
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px;">Autosave found: ${d.artistName} — Week ${d.week}</div>
+          <button class="btn btn-ghost btn-sm" onclick="continueGame()">▶ Continue Saved Game</button>
+        `;
+        document.getElementById('splash').appendChild(cont);
+        window._autoSaveData = d;
+      }
+    }catch{}
+  }
+});
+
+window.continueGame = function(){
+  if(!window._autoSaveData) return;
+  GS = window._autoSaveData;
+  document.getElementById('splash').style.display='none';
+  const game=document.getElementById('game');
+  game.style.display='flex';
+  generateBgParticles();
+  initCoverColors();
+  initCitySelector();
+  generateInterview();
+  renderAll();
+  notify('📂',`Welcome back, <strong>${GS.artistName}</strong>!`,'good');
+};
+
+// Initialize type buttons
+document.addEventListener('DOMContentLoaded', ()=>{ setMusicType('single'); });
+setTimeout(()=>{ setMusicType('single'); }, 100);
+</script>
+</body>
+</html>
